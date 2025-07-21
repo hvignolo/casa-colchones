@@ -11,37 +11,9 @@
     <link rel="icon" href="./public/favicon.ico" type="image/x-icon">
     
     <style>
-        /* Ocultar elementos de desarrollo */
-        div[style*="position: fixed"] {
-            display: none !important;
-        }
-        
-        button[title*="Open"],
-        a[title*="Open"] {
-            display: none !important;
-        }
-        
-        /* Loading spinner */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Estilos adicionales para mejor visualización */
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 2s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -50,94 +22,443 @@
             <div style="text-align: center;">
                 <div class="loading"></div>
                 <p style="margin-top: 20px; color: #666; font-size: 18px;">Cargando Casa de Colchones Reposar...</p>
-                <p style="color: #888; font-size: 14px;">Inicializando sistema de gestión</p>
             </div>
         </div>
     </div>
 
-    <!-- Cargar tu App desde el archivo src/App.tsx convertido -->
     <script type="text/babel">
-        // Aquí va una versión simplificada de tu aplicación
-        // Para que funcione en GitHub Pages sin build process
-        
         const { useState, useEffect, useMemo } = React;
-        
-        // Iconos básicos
-        const Search = () => React.createElement("svg", {
-            className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+
+        // Iconos simplificados
+        const Search = ({ className = "w-5 h-5" }) => React.createElement("svg", {
+            className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
         }, React.createElement("path", {
             strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2,
             d: "m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"
         }));
-        
-        const Bed = () => React.createElement("svg", {
-            className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+
+        const Settings = ({ className = "w-5 h-5" }) => React.createElement("svg", {
+            className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+        }, React.createElement("path", {
+            strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2,
+            d: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+        }), React.createElement("circle", { cx: "12", cy: "12", r: "3" }));
+
+        const Bed = ({ className = "w-5 h-5" }) => React.createElement("svg", {
+            className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
         }, React.createElement("path", {
             strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2,
             d: "M3 7v11m0 0l2 2h14l2-2V7M3 18V7a1 1 0 011-1h16a1 1 0 011 1v11M7 7V5a1 1 0 011-1h8a1 1 0 011 1v2"
         }));
-        
-        // Datos de ejemplo (usa tu backup)
-        const sampleProducts = [
+
+        const ShoppingBag = ({ className = "w-5 h-5" }) => React.createElement("svg", {
+            className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+        }, React.createElement("path", {
+            strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2,
+            d: "M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+        }));
+
+        const Package = ({ className = "w-5 h-5" }) => React.createElement("svg", {
+            className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+        }, React.createElement("path", {
+            strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2,
+            d: "m7.5 4.27 9 5.15M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8z"
+        }));
+
+        const User = ({ className = "w-5 h-5" }) => React.createElement("svg", {
+            className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+        }, React.createElement("path", {
+            strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2,
+            d: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+        }), React.createElement("circle", { cx: "12", cy: "7", r: "4" }));
+
+        const LogOut = ({ className = "w-5 h-5" }) => React.createElement("svg", {
+            className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+        }, React.createElement("path", {
+            strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2,
+            d: "M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9"
+        }));
+
+        const Lock = ({ className = "w-5 h-5" }) => React.createElement("svg", {
+            className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+        }, React.createElement("rect", { x: "3", y: "11", width: "18", height: "11", rx: "2", ry: "2" }), 
+        React.createElement("path", { d: "M7 11V7a5 5 0 0 1 10 0v4" }));
+
+        const UserPlus = ({ className = "w-5 h-5" }) => React.createElement("svg", {
+            className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+        }, React.createElement("path", {
+            strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2,
+            d: "M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+        }), React.createElement("circle", { cx: "8.5", cy: "7", r: "4" }), 
+        React.createElement("line", { x1: "20", y1: "8", x2: "20", y2: "14" }),
+        React.createElement("line", { x1: "23", y1: "11", x2: "17", y2: "11" }));
+
+        const X = ({ className = "w-5 h-5" }) => React.createElement("svg", {
+            className, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+        }, React.createElement("path", {
+            strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2,
+            d: "m18 6-12 12M6 6l12 12"
+        }));
+
+        // Datos de productos de tu backup
+        const defaultProducts = [
             {
-                id: 1,
-                codigo: "500077",
-                nombre: "Mikonos 140",
-                medidas: "140 x 190 x 25",
-                tipo: "COLCHONES",
-                subtipo: "Resortes Tradicionales",
-                precioContado: 370000,
-                precioTarjeta: 516400,
+                id: 1, codigo: "500077", nombre: "Mikonos 140", medidas: "140 x 190 x 25", 
+                tipo: "COLCHONES", subtipo: "Resortes Tradicionales", precioContado: 370000, precioTarjeta: 516400,
+                detalles: "Colchón de máxima duración y firmeza con resortes de acero bicónicos. Cuenta con 2 Marcos perimetrales y Estabilizadores laterales de acero que permiten mayor estabilidad. Totalmente matelasseado. Medida 140 x 190 en tela sábana de gran calidad. Medida 100 x190 en Jackard Rojo y de 80 x 190 en Jackard celeste.",
+                image: "https://www.reposar.com/76-large_default/mikonos.jpg", marca: "Reposar"
+            },
+            {
+                id: 2, codigo: "500083", nombre: "Mikonos 080", medidas: "080 x 190 x 25",
+                tipo: "COLCHONES", subtipo: "Resortes", precioContado: 234000, precioTarjeta: 328000,
                 detalles: "Colchón de máxima duración y firmeza con resortes de acero bicónicos.",
-                image: "https://www.reposar.com/76-large_default/mikonos.jpg",
-                marca: "Reposar"
+                image: "https://www.reposar.com/76-large_default/mikonos.jpg", marca: "Reposar"
+            },
+            {
+                id: 3, codigo: "500194", nombre: "BERLIN EURO 100", medidas: "100 x 190 x 30",
+                tipo: "COLCHONES", subtipo: "Resortes Individuales", precioContado: 490000, precioTarjeta: 700000,
+                detalles: "Colchón con resortes ensacados individuales para máximo confort.",
+                image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop", marca: "Reposar"
             }
-            // Agrega más productos de tu backup aquí
         ];
-        
+
+        const defaultStoreData = {
+            name: "La Casa de Colchones Reposar",
+            location: "Av. Lavalle 2950, Centro",
+            phone: "3756 - 436556",
+            email: "info@reposar.com",
+            hours: "Lun-Vie 8:00 - 12:30 y 16:30 - 20:30. Sáb 9:00-12:30"
+        };
+
+        // Aplicación principal
         const App = () => {
+            const [currentUser, setCurrentUser] = useState(null);
+            const [showLogin, setShowLogin] = useState(true);
+            const [loginMode, setLoginMode] = useState("login");
             const [searchQuery, setSearchQuery] = useState("");
-            const [products] = useState(sampleProducts);
-            
+            const [activeFilter, setActiveFilter] = useState("TODOS");
+            const [products] = useState(defaultProducts);
+            const [storeData] = useState(defaultStoreData);
+            const [selectedProduct, setSelectedProduct] = useState(null);
+
+            // Verificar usuario logueado
+            useEffect(() => {
+                const savedUser = localStorage.getItem("currentUser");
+                if (savedUser) {
+                    setCurrentUser(JSON.parse(savedUser));
+                    setShowLogin(false);
+                }
+            }, []);
+
+            // Login
+            const handleLogin = (username, password, businessName) => {
+                const users = JSON.parse(localStorage.getItem("app_users") || "{}");
+                
+                if (loginMode === "register") {
+                    if (users[username]) return false;
+                    users[username] = { username, password, businessName, registeredAt: new Date().toISOString() };
+                    localStorage.setItem("app_users", JSON.stringify(users));
+                    const newUser = users[username];
+                    setCurrentUser(newUser);
+                    localStorage.setItem("currentUser", JSON.stringify(newUser));
+                    setShowLogin(false);
+                    return true;
+                } else {
+                    const user = users[username];
+                    if (user && user.password === password) {
+                        setCurrentUser(user);
+                        localStorage.setItem("currentUser", JSON.stringify(user));
+                        setShowLogin(false);
+                        return true;
+                    }
+                    return false;
+                }
+            };
+
+            // Filtrar productos
+            const filteredProducts = useMemo(() => {
+                let filtered = products;
+                if (activeFilter !== "TODOS") {
+                    filtered = filtered.filter(product => product.tipo === activeFilter);
+                }
+                if (searchQuery.trim()) {
+                    filtered = filtered.filter(product =>
+                        product.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        product.codigo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        product.marca.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                }
+                return filtered;
+            }, [activeFilter, searchQuery, products]);
+
+            // Compartir WhatsApp
+            const shareOnWhatsApp = (product) => {
+                const message = `*${storeData.name}*
+      
+*${product.nombre}*
+• Código: ${product.codigo}
+• Marca: ${product.marca}
+• Medidas: ${product.medidas}
+• Tipo: ${product.tipo} - ${product.subtipo}
+
+*PRECIOS:*
+• Contado: $${product.precioContado.toLocaleString()}
+• Tarjeta: $${product.precioTarjeta.toLocaleString()}
+• Ahorrás: $${(product.precioTarjeta - product.precioContado).toLocaleString()} pagando de contado
+
+*Descripción:*
+${product.detalles}
+
+${product.image ? `*Imagen:* ${product.image}` : ''}
+
+*Contacto:*
+• Ubicación: ${storeData.location}
+• Teléfono: ${storeData.phone}
+• Horarios: ${storeData.hours}`;
+
+                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            };
+
+            const filterChips = [
+                { id: "TODOS", label: "Todos", icon: ShoppingBag },
+                { id: "COLCHONES", label: "Colchones", icon: Bed },
+                { id: "SOMMIERS", label: "Sommiers", icon: Bed },
+                { id: "RESPALDOS", label: "Respaldos", icon: Package },
+                { id: "ALMOHADAS", label: "Almohadas", icon: Package },
+                { id: "OTROS", label: "Otros", icon: ShoppingBag },
+            ];
+
+            // Componente de Login
+            const LoginForm = () => {
+                const [formData, setFormData] = useState({ username: "", password: "", businessName: "" });
+                const [loginError, setLoginError] = useState("");
+
+                const handleSubmit = (e) => {
+                    e.preventDefault();
+                    if (!formData.username || !formData.password || (loginMode === "register" && !formData.businessName)) {
+                        setLoginError("Todos los campos son requeridos");
+                        return;
+                    }
+                    const success = handleLogin(formData.username, formData.password, formData.businessName);
+                    if (!success) {
+                        setLoginError(loginMode === "login" ? "Usuario o contraseña incorrectos" : "El usuario ya existe");
+                    }
+                };
+
+                return React.createElement("div", { className: "min-h-screen bg-gray-100 flex items-center justify-center p-4" },
+                    React.createElement("div", { className: "bg-white rounded-lg shadow-lg p-8 max-w-md w-full" },
+                        React.createElement("div", { className: "text-center mb-6" },
+                            React.createElement("div", { className: "w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4" },
+                                React.createElement(Bed, { className: "w-8 h-8 text-white" })
+                            ),
+                            React.createElement("h1", { className: "text-2xl font-bold mb-2" }, "Casa de Colchones"),
+                            React.createElement("p", { className: "text-gray-600" },
+                                loginMode === "login" ? "Inicia sesión en tu cuenta" : "Crea tu cuenta de negocio"
+                            )
+                        ),
+                        loginError && React.createElement("div", { className: "bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-red-700 text-sm" }, loginError),
+                        React.createElement("form", { onSubmit: handleSubmit, className: "space-y-4" },
+                            React.createElement("input", {
+                                type: "text", placeholder: "Usuario", value: formData.username,
+                                onChange: (e) => setFormData({ ...formData, username: e.target.value }),
+                                className: "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            }),
+                            React.createElement("input", {
+                                type: "password", placeholder: "Contraseña", value: formData.password,
+                                onChange: (e) => setFormData({ ...formData, password: e.target.value }),
+                                className: "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            }),
+                            loginMode === "register" && React.createElement("input", {
+                                type: "text", placeholder: "Nombre del Negocio", value: formData.businessName,
+                                onChange: (e) => setFormData({ ...formData, businessName: e.target.value }),
+                                className: "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            }),
+                            React.createElement("button", {
+                                type: "submit",
+                                className: "w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 flex items-center justify-center gap-2"
+                            },
+                                React.createElement(loginMode === "login" ? Lock : UserPlus, { className: "w-5 h-5" }),
+                                loginMode === "login" ? "Iniciar Sesión" : "Crear Cuenta"
+                            )
+                        ),
+                        React.createElement("div", { className: "mt-4 text-center" },
+                            React.createElement("button", {
+                                onClick: () => setLoginMode(loginMode === "login" ? "register" : "login"),
+                                className: "text-blue-600 hover:text-blue-700"
+                            },
+                                loginMode === "login" ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"
+                            )
+                        )
+                    )
+                );
+            };
+
+            // Modal de producto
+            const ProductModal = ({ product, onClose }) => {
+                if (!product) return null;
+
+                return React.createElement("div", { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" },
+                    React.createElement("div", { className: "bg-white rounded-lg max-w-4xl w-full max-h-90vh overflow-y-auto" },
+                        React.createElement("div", { className: "p-6" },
+                            React.createElement("div", { className: "flex justify-between items-start mb-4" },
+                                React.createElement("h2", { className: "text-2xl font-bold" }, product.nombre),
+                                React.createElement("button", { onClick: onClose, className: "p-2 hover:bg-gray-100 rounded-full" },
+                                    React.createElement(X, { className: "w-6 h-6" })
+                                )
+                            ),
+                            React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6" },
+                                React.createElement("div", null,
+                                    product.image && React.createElement("img", {
+                                        src: product.image, alt: product.nombre,
+                                        className: "w-full h-64 object-cover rounded-lg mb-4"
+                                    }),
+                                    React.createElement("div", { className: "space-y-3" },
+                                        React.createElement("p", null, React.createElement("strong", null, "Código: "), product.codigo),
+                                        React.createElement("p", null, React.createElement("strong", null, "Marca: "), product.marca),
+                                        React.createElement("p", null, React.createElement("strong", null, "Medidas: "), product.medidas),
+                                        React.createElement("p", null, React.createElement("strong", null, "Tipo: "), product.tipo, " - ", product.subtipo)
+                                    )
+                                ),
+                                React.createElement("div", { className: "space-y-4" },
+                                    React.createElement("div", { className: "bg-gray-50 rounded-lg p-4" },
+                                        React.createElement("h3", { className: "font-semibold text-lg mb-3" }, "Precios"),
+                                        React.createElement("div", { className: "space-y-2" },
+                                            React.createElement("div", { className: "flex justify-between" },
+                                                React.createElement("span", null, "Contado:"),
+                                                React.createElement("span", { className: "font-bold text-green-600 text-xl" }, "$", product.precioContado.toLocaleString())
+                                            ),
+                                            React.createElement("div", { className: "flex justify-between" },
+                                                React.createElement("span", null, "Tarjeta:"),
+                                                React.createElement("span", { className: "font-bold text-blue-600" }, "$", product.precioTarjeta.toLocaleString())
+                                            ),
+                                            React.createElement("div", { className: "flex justify-between text-sm pt-2 border-t" },
+                                                React.createElement("span", null, "Ahorro contado:"),
+                                                React.createElement("span", { className: "text-green-600 font-medium" }, "$", (product.precioTarjeta - product.precioContado).toLocaleString())
+                                            )
+                                        )
+                                    ),
+                                    React.createElement("div", { className: "bg-gray-50 rounded-lg p-4" },
+                                        React.createElement("h4", { className: "font-semibold mb-2" }, "Descripción"),
+                                        React.createElement("p", { className: "text-gray-700 text-sm leading-relaxed" }, product.detalles)
+                                    ),
+                                    React.createElement("div", { className: "space-y-2" },
+                                        React.createElement("button", {
+                                            onClick: () => shareOnWhatsApp(product),
+                                            className: "w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 flex items-center justify-center gap-2"
+                                        },
+                                            React.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 24 24" },
+                                                React.createElement("path", { d: "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" })
+                                            ),
+                                            "Compartir por WhatsApp"
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
+            };
+
+            if (showLogin || !currentUser) {
+                return React.createElement(LoginForm);
+            }
+
             return React.createElement("div", { className: "min-h-screen bg-gray-50" },
                 // Header
-                React.createElement("header", { className: "bg-white shadow-sm" },
+                React.createElement("header", { className: "bg-white shadow-sm sticky top-0 z-40" },
                     React.createElement("div", { className: "px-4 py-3" },
-                        React.createElement("h1", { className: "text-xl font-semibold text-gray-900 mb-4" }, "Casa de Colchones Reposar"),
+                        React.createElement("div", { className: "flex items-center justify-between mb-4" },
+                            React.createElement("div", { className: "flex items-center gap-3" },
+                                React.createElement("h1", { className: "text-xl font-semibold text-gray-900" }, storeData.name),
+                                React.createElement("span", { className: "text-sm text-gray-500" }, "•"),
+                                React.createElement("div", { className: "flex items-center gap-1" },
+                                    React.createElement(User, { className: "w-4 h-4 text-gray-400" }),
+                                    React.createElement("span", { className: "text-sm text-gray-600" }, currentUser.username)
+                                )
+                            ),
+                            React.createElement("button", {
+                                onClick: () => {
+                                    if (confirm("¿Cerrar sesión?")) {
+                                        setCurrentUser(null);
+                                        localStorage.removeItem("currentUser");
+                                        setShowLogin(true);
+                                    }
+                                },
+                                className: "p-2 hover:bg-gray-100 rounded-full"
+                            }, React.createElement(LogOut, { className: "w-6 h-6 text-gray-600" }))
+                        ),
                         React.createElement("div", { className: "relative" },
                             React.createElement(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" }),
                             React.createElement("input", {
-                                type: "text",
-                                placeholder: "Buscar productos...",
-                                value: searchQuery,
-                                onChange: (e) => setSearchQuery(e.target.value),
-                                className: "w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                type: "text", placeholder: "Buscar por código, nombre, marca...",
+                                value: searchQuery, onChange: (e) => setSearchQuery(e.target.value),
+                                className: "w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
                             })
                         )
                     )
                 ),
-                // Main content
+                
+                // Filter chips
+                React.createElement("div", { className: "px-4 py-3 bg-white border-b" },
+                    React.createElement("div", { className: "flex gap-2 overflow-x-auto pb-2" },
+                        filterChips.map(chip => {
+                            const IconComponent = chip.icon;
+                            const isActive = activeFilter === chip.id;
+                            return React.createElement("button", {
+                                key: chip.id,
+                                onClick: () => setActiveFilter(chip.id),
+                                className: `flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all ${isActive ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                            },
+                                React.createElement(IconComponent, { className: "w-4 h-4" }),
+                                React.createElement("span", { className: "text-sm font-medium" }, chip.label)
+                            );
+                        })
+                    )
+                ),
+
+                // Products
                 React.createElement("main", { className: "p-4" },
-                    React.createElement("div", { className: "text-center py-12" },
-                        React.createElement("div", { className: "text-gray-400 mb-4" },
-                            React.createElement(Bed, { className: "w-16 h-16 mx-auto" })
-                        ),
-                        React.createElement("h2", { className: "text-2xl font-bold text-gray-800 mb-2" }, "Sistema en Funcionamiento"),
-                        React.createElement("p", { className: "text-gray-600 mb-4" }, "¡Tu aplicación se ha desplegado correctamente en GitHub Pages!"),
-                        React.createElement("div", { className: "bg-white rounded-lg shadow p-6 max-w-md mx-auto" },
-                            React.createElement("h3", { className: "font-semibold mb-2" }, "Próximos pasos:"),
-                            React.createElement("ul", { className: "text-sm text-gray-600 text-left space-y-1" },
-                                React.createElement("li", null, "✓ Aplicación desplegada"),
-                                React.createElement("li", null, "✓ GitHub Pages activado"),
-                                React.createElement("li", null, "• Integrar código completo"),
-                                React.createElement("li", null, "• Configurar dominio personalizado (opcional)")
+                    filteredProducts.length === 0 ? 
+                        React.createElement("div", { className: "text-center py-12" },
+                            React.createElement("div", { className: "text-gray-400 mb-4" },
+                                React.createElement(Search, { className: "w-12 h-12 mx-auto" })
+                            ),
+                            React.createElement("p", { className: "text-gray-500 text-lg" }, "No se encontraron productos")
+                        ) :
+                        React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" },
+                            filteredProducts.map(product =>
+                                React.createElement("div", {
+                                    key: product.id,
+                                    className: "bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer",
+                                    onClick: () => setSelectedProduct(product)
+                                },
+                                    product.image && React.createElement("img", {
+                                        src: product.image, alt: product.nombre,
+                                        className: "w-full h-40 object-cover rounded-lg mb-3"
+                                    }),
+                                    React.createElement("div", { className: "space-y-2" },
+                                        React.createElement("h3", { className: "font-semibold text-gray-900 text-sm" }, product.nombre),
+                                        React.createElement("p", { className: "text-xs text-gray-500" }, `${product.codigo} • ${product.marca}`),
+                                        React.createElement("p", { className: "text-xs text-gray-600" }, product.medidas),
+                                        React.createElement("div", { className: "flex justify-between items-end" },
+                                            React.createElement("div", null,
+                                                React.createElement("p", { className: "text-green-600 font-bold text-sm" }, "$", product.precioContado.toLocaleString()),
+                                                React.createElement("p", { className: "text-blue-600 text-xs" }, "$", product.precioTarjeta.toLocaleString())
+                                            ),
+                                            React.createElement("span", { className: "bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium" }, product.tipo)
+                                        )
+                                    )
+                                )
                             )
                         )
-                    )
-                )
+                ),
+
+                // Modal de producto
+                React.createElement(ProductModal, { product: selectedProduct, onClose: () => setSelectedProduct(null) })
             );
         };
-        
+
         // Renderizar
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(React.createElement(App));
