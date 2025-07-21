@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casa de Colchones Reposar</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="./public/favicon.ico" type="image/x-icon">
+    
+    <style>
+        /* Ocultar elementos de desarrollo */
+        div[style*="position: fixed"] {
+            display: none !important;
+        }
+        
+        button[title*="Open"],
+        a[title*="Open"] {
+            display: none !important;
+        }
+        
+        /* Loading spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Estilos adicionales para mejor visualización */
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f8f9fa;">
+            <div style="text-align: center;">
+                <div class="loading"></div>
+                <p style="margin-top: 20px; color: #666; font-size: 18px;">Cargando Casa de Colchones Reposar...</p>
+                <p style="color: #888; font-size: 14px;">Inicializando sistema de gestión</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cargar tu App desde el archivo src/App.tsx convertido -->
+    <script type="text/babel">
+        // Aquí va una versión simplificada de tu aplicación
+        // Para que funcione en GitHub Pages sin build process
+        
+        const { useState, useEffect, useMemo } = React;
+        
+        // Iconos básicos
+        const Search = () => React.createElement("svg", {
+            className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+        }, React.createElement("path", {
+            strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2,
+            d: "m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"
+        }));
+        
+        const Bed = () => React.createElement("svg", {
+            className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"
+        }, React.createElement("path", {
+            strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2,
+            d: "M3 7v11m0 0l2 2h14l2-2V7M3 18V7a1 1 0 011-1h16a1 1 0 011 1v11M7 7V5a1 1 0 011-1h8a1 1 0 011 1v2"
+        }));
+        
+        // Datos de ejemplo (usa tu backup)
+        const sampleProducts = [
+            {
+                id: 1,
+                codigo: "500077",
+                nombre: "Mikonos 140",
+                medidas: "140 x 190 x 25",
+                tipo: "COLCHONES",
+                subtipo: "Resortes Tradicionales",
+                precioContado: 370000,
+                precioTarjeta: 516400,
+                detalles: "Colchón de máxima duración y firmeza con resortes de acero bicónicos.",
+                image: "https://www.reposar.com/76-large_default/mikonos.jpg",
+                marca: "Reposar"
+            }
+            // Agrega más productos de tu backup aquí
+        ];
+        
+        const App = () => {
+            const [searchQuery, setSearchQuery] = useState("");
+            const [products] = useState(sampleProducts);
+            
+            return React.createElement("div", { className: "min-h-screen bg-gray-50" },
+                // Header
+                React.createElement("header", { className: "bg-white shadow-sm" },
+                    React.createElement("div", { className: "px-4 py-3" },
+                        React.createElement("h1", { className: "text-xl font-semibold text-gray-900 mb-4" }, "Casa de Colchones Reposar"),
+                        React.createElement("div", { className: "relative" },
+                            React.createElement(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" }),
+                            React.createElement("input", {
+                                type: "text",
+                                placeholder: "Buscar productos...",
+                                value: searchQuery,
+                                onChange: (e) => setSearchQuery(e.target.value),
+                                className: "w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            })
+                        )
+                    )
+                ),
+                // Main content
+                React.createElement("main", { className: "p-4" },
+                    React.createElement("div", { className: "text-center py-12" },
+                        React.createElement("div", { className: "text-gray-400 mb-4" },
+                            React.createElement(Bed, { className: "w-16 h-16 mx-auto" })
+                        ),
+                        React.createElement("h2", { className: "text-2xl font-bold text-gray-800 mb-2" }, "Sistema en Funcionamiento"),
+                        React.createElement("p", { className: "text-gray-600 mb-4" }, "¡Tu aplicación se ha desplegado correctamente en GitHub Pages!"),
+                        React.createElement("div", { className: "bg-white rounded-lg shadow p-6 max-w-md mx-auto" },
+                            React.createElement("h3", { className: "font-semibold mb-2" }, "Próximos pasos:"),
+                            React.createElement("ul", { className: "text-sm text-gray-600 text-left space-y-1" },
+                                React.createElement("li", null, "✓ Aplicación desplegada"),
+                                React.createElement("li", null, "✓ GitHub Pages activado"),
+                                React.createElement("li", null, "• Integrar código completo"),
+                                React.createElement("li", null, "• Configurar dominio personalizado (opcional)")
+                            )
+                        )
+                    )
+                )
+            );
+        };
+        
+        // Renderizar
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
+    </script>
+</body>
+</html>
