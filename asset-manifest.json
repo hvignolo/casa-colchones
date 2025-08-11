@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.css": "/casa-colchones/static/css/main.1ef9967e.css",
-    "main.js": "/casa-colchones/static/js/main.72a25056.js",
+    "main.css": "/casa-colchones/static/css/main.29bffea9.css",
+    "main.js": "/casa-colchones/static/js/main.a6b6ea81.js",
     "index.html": "/casa-colchones/index.html"
   },
   "entrypoints": [
-    "static/css/main.1ef9967e.css",
-    "static/js/main.72a25056.js"
+    "static/css/main.29bffea9.css",
+    "static/js/main.a6b6ea81.js"
   ]
 }
