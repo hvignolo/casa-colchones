@@ -54,6 +54,16 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const [selectedInstallments, setSelectedInstallments] = useState<number>(6);
   const [useMacroPromo, setUseMacroPromo] = useState<boolean>(true);
 
+  // Cálculo de financiación usando el hook personalizado (ANTES del return condicional)
+  const financingCalculation = useFinancingCalculator({
+    amount: product?.precioContado || 0,
+    cardType: selectedCard,
+    installments: selectedInstallments,
+    settlement: 10, // Fijo en 10 días
+    useMacroPromo,
+    useMiPyMe: false
+  });
+
   if (!product) return null;
 
   // Función para formatear precios con punto como separador de miles y coma
@@ -64,16 +74,6 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
       maximumFractionDigits: 2,
     });
   };
-
-  // Cálculo de financiación usando el hook personalizado
-  const financingCalculation = useFinancingCalculator({
-    amount: product.precioContado,
-    cardType: selectedCard,
-    installments: selectedInstallments,
-    settlement: 10, // Fijo en 10 días
-    useMacroPromo,
-    useMiPyMe: false
-  });
 
   // Opciones de cuotas disponibles
   const availableInstallments = [1, 3, 6, 9, 12];
