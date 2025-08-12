@@ -52,7 +52,7 @@ export const defaultProducts: Product[] = [
     precioContado: 284000,
     precioTarjeta: 398000,
     detalles: "Colchón de máxima duración y firmeza con resortes de acero bicónicos. Medida 100 x190 en Jackard Rojo.",
-    image: "https://www.reposar.com/76-large_default/mikonos.jpg",
+    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop",
     marca: "Reposar"
   },
   {

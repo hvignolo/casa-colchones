@@ -3,7 +3,7 @@ import { Bed, Lock, UserPlus } from 'lucide-react';
 import { LoginMode, User } from './types';
 
 interface LoginFormProps {
-  onLogin: (username: string, password: string, businessName: string) => boolean;
+  onLogin: (username: string, password: string, businessName: string) => Promise<boolean>;
   onShowToast: (message: string) => void;
 }
 
@@ -65,19 +65,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
     }
 
     // Simular delay de autenticación
-    setTimeout(() => {
-      const success = onLogin(
-        formData.username,
-        formData.password,
-        formData.businessName
-      );
-      
-      if (!success) {
-        setLoginError(
-          loginMode === "login"
-            ? "Usuario o contraseña incorrectos"
-            : "El usuario ya existe, intenta con otro nombre"
+    setTimeout(async () => {
+      try {
+        const success = await onLogin(
+          formData.username,
+          formData.password,
+          formData.businessName
         );
+        
+        if (!success) {
+          setLoginError(
+            loginMode === "login"
+              ? "Usuario o contraseña incorrectos"
+              : "El usuario ya existe, intenta con otro nombre"
+          );
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+        setLoginError("Error durante el proceso de autenticación");
       }
       setIsLoading(false);
     }, 800);
@@ -151,11 +156,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
 
           {/* Username Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="login-username" className="block text-sm font-medium text-gray-700 mb-2">
               Usuario
             </label>
             <input
               type="text"
+              id="login-username"
+              name="username"
               value={formData.username}
               onChange={(e) => handleInputChange("username", e.target.value)}
               className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 ${
@@ -164,16 +171,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
               placeholder="Ingresa tu usuario"
               required
               disabled={isLoading}
+              autoComplete="username"
             />
           </div>
 
           {/* Password Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-2">
               Contraseña
             </label>
             <input
               type="password"
+              id="login-password"
+              name="password"
               value={formData.password}
               onChange={(e) => handleInputChange("password", e.target.value)}
               className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 ${
@@ -182,17 +192,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
               placeholder="Ingresa tu contraseña"
               required
               disabled={isLoading}
+              autoComplete={loginMode === "register" ? "new-password" : "current-password"}
             />
           </div>
 
           {/* Business Name Field (only for register) */}
           {loginMode === "register" && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="login-business-name" className="block text-sm font-medium text-gray-700 mb-2">
                 Nombre del Negocio
               </label>
               <input
                 type="text"
+                id="login-business-name"
+                name="businessName"
                 value={formData.businessName}
                 onChange={(e) => handleInputChange("businessName", e.target.value)}
                 className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 ${
@@ -201,6 +214,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
                 placeholder="Ej: Casa de Colchones Miranda"
                 required
                 disabled={isLoading}
+                autoComplete="organization"
               />
             </div>
           )}
@@ -255,6 +269,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
         {/* Toggle Mode Button */}
         <div className="mt-6 text-center">
           <button
+            type="button"
             onClick={toggleLoginMode}
             className="text-blue-700 hover:text-blue-800 font-medium bg-white bg-opacity-80 px-4 py-2 rounded-lg transition-colors"
             disabled={isLoading}

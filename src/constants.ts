@@ -59,18 +59,18 @@ export const FILTER_IDS = {
 } as const;
 
 /**
- * Configuración básica de los chips de filtros (sin iconos)
+ * Configuración básica de los chips de filtros (ACTUALIZADA con nuevos iconos)
  * Los iconos se asignarán en el componente que los use
  */
 export const FILTER_CHIPS_CONFIG = [
-  { id: "TODOS", label: "Todos", iconType: "ShoppingBag" },
+  { id: "TODOS", label: "Todos", iconType: "Grid3X3" },
   { id: "COLCHONES", label: "Colchones", iconType: "Bed" },
-  { id: "SOMMIERS", label: "Sommiers", iconType: "Bed" },
-  { id: "RESORTES", label: "Resortes", iconType: "Bed" },
-  { id: "ESPUMA", label: "Espuma", iconType: "Bed" },
-  { id: "RESPALDOS", label: "Respaldos", iconType: "Armchair" },
-  { id: "ALMOHADAS", label: "Almohadas", iconType: "Package" },
-  { id: "OTROS", label: "Otros", iconType: "ShoppingBag" },
+  { id: "SOMMIERS", label: "Sommiers", iconType: "SommierIcon" },
+  { id: "RESORTES", label: "Resortes", iconType: "SpringIcon" },
+  { id: "ESPUMA", label: "Espuma", iconType: "FoamIcon" },
+  { id: "RESPALDOS", label: "Respaldos", iconType: "BackrestIcon" },
+  { id: "ALMOHADAS", label: "Almohadas", iconType: "PillowIcon" },
+  { id: "OTROS", label: "Otros", iconType: "Package" },
 ] as const;
 
 // ==========================================
@@ -302,7 +302,7 @@ export const MIN_LENGTHS = {
  */
 export const REGEX_PATTERNS = {
   EMAIL: /\S+@\S+\.\S+/,
-  PHONE: /^[\d\s\-\+\(\)]+$/,
+  PHONE: /^[\d\s\-+()]+$/,
   IMAGE_URL: /\.(jpg|jpeg|png|gif|webp|svg)$/i,
   NUMERIC_CODE: /^\d+$/
 } as const;
@@ -414,7 +414,11 @@ export const SUCCESS_MESSAGES = {
   PRICES_UPDATED: '¡Precios actualizados exitosamente!',
   STORE_DATA_UPDATED: '¡Datos de la tienda actualizados correctamente!',
   PRODUCT_SAVED: '¡Producto guardado exitosamente!',
-  PRODUCT_DELETED: '¡Producto eliminado exitosamente!'
+  PRODUCT_DELETED: '¡Producto eliminado exitosamente!',
+  // NUEVOS MENSAJES PARA FUNCIONALIDAD OFFLINE
+  SYNC_COMPLETE: '✅ Sincronización completada',
+  OFFLINE_MODE_ACTIVE: '🔄 Modo offline activado - Los datos se guardarán localmente',
+  ONLINE_MODE_RESTORED: '🌐 Conexión restaurada - Sincronizando datos...'
 } as const;
 
 /**
@@ -431,7 +435,12 @@ export const ERROR_MESSAGES = {
   BUSINESS_NAME_TOO_SHORT: 'El nombre del negocio debe tener al menos 3 caracteres',
   INVALID_FILE: 'Error al procesar el archivo. Verifica el formato.',
   INVALID_PRICES_FILE: 'Error al actualizar precios. Verifica el archivo.',
-  GENERIC_ERROR: 'Ha ocurrido un error inesperado'
+  GENERIC_ERROR: 'Ha ocurrido un error inesperado',
+  // NUEVOS MENSAJES PARA FUNCIONALIDAD OFFLINE
+  NETWORK_ERROR: '❌ Error de conexión - Funcionando en modo offline',
+  SYNC_ERROR: '❌ Error durante la sincronización',
+  STORAGE_ERROR: '❌ Error al guardar datos localmente',
+  LOAD_ERROR: '❌ Error al cargar datos'
 } as const;
 
 /**
@@ -441,7 +450,9 @@ export const CONFIRMATION_MESSAGES = {
   DELETE_PRODUCT: '¿Estás seguro de que quieres eliminar este producto?',
   LOGOUT: '¿Estás seguro que quieres cerrar sesión?',
   RESET_DATA: '¿Estás seguro de que quieres restablecer todos los datos? Esta acción no se puede deshacer.',
-  UNSAVED_CHANGES: 'Tienes cambios sin guardar. ¿Estás seguro de que quieres continuar?'
+  UNSAVED_CHANGES: 'Tienes cambios sin guardar. ¿Estás seguro de que quieres continuar?',
+  // NUEVOS MENSAJES PARA FUNCIONALIDAD OFFLINE
+  CLEAR_CACHE: '¿Deseas limpiar el caché de la aplicación?'
 } as const;
 
 // ==========================================
@@ -453,9 +464,9 @@ export const CONFIRMATION_MESSAGES = {
  */
 export const APP_CONFIG = {
   NAME: 'Casa de Colchones',
-  VERSION: '1.0.0',
+  VERSION: '2.0.0', // Actualizada versión para PWA
   AUTHOR: 'Tu Empresa',
-  DESCRIPTION: 'Sistema de gestión para tiendas de colchones',
+  DESCRIPTION: 'Sistema de gestión para tiendas de colchones con funcionalidad offline',
   DEFAULT_LANGUAGE: 'es-AR',
   DEFAULT_CURRENCY: 'ARS'
 } as const;
@@ -469,7 +480,9 @@ export const API_ENDPOINTS = {
   PRODUCTS: '/api/products',
   USERS: '/api/users',
   EXPORT: '/api/export',
-  IMPORT: '/api/import'
+  IMPORT: '/api/import',
+  // NUEVOS ENDPOINTS PARA FUNCIONALIDAD OFFLINE
+  SYNC: '/api/sync'
 } as const;
 
 /**
@@ -481,5 +494,83 @@ export const STORAGE_KEYS = {
   USER_PREFIX: 'user_',
   STORE_DATA: 'storeData',
   PRODUCTS: 'products',
-  SAVED_CARTOLAS: 'savedCartolas'
+  SAVED_CARTOLAS: 'savedCartolas',
+  // NUEVAS CLAVES PARA FUNCIONALIDAD OFFLINE
+  OFFLINE_ACTIONS: 'offline_actions_',
+  LAST_SYNC: 'last_sync_'
+} as const;
+
+// ==========================================
+// NUEVAS CONSTANTES PARA FUNCIONALIDAD OFFLINE
+// ==========================================
+
+/**
+ * Configuración de sincronización offline
+ */
+export const SYNC_CONFIG = {
+  RETRY_INTERVAL: 5000, // 5 segundos para reintentar conexión
+  MAX_RETRIES: 3,
+  BATCH_SIZE: 50, // Cantidad de elementos a sincronizar por lote
+  TIMEOUT: 30000 // 30 segundos timeout para requests
+} as const;
+
+/**
+ * Configuración de IndexedDB
+ */
+export const INDEXEDDB_CONFIG = {
+  DB_NAME: 'CasaColchonesDB',
+  DB_VERSION: 1,
+  STORES: {
+    PRODUCTS: 'products',
+    STORE_DATA: 'storeData', 
+    USERS: 'users',
+    SYNC_QUEUE: 'syncQueue',
+    OFFLINE_ACTIONS: 'offlineActions',
+    CACHE: 'cache'
+  }
+} as const;
+
+/**
+ * Configuración PWA
+ */
+export const PWA_CONFIG = {
+  THEME_COLOR: '#2563eb',
+  BACKGROUND_COLOR: '#ffffff',
+  DISPLAY: 'standalone',
+  ORIENTATION: 'portrait-primary'
+} as const;
+
+/**
+ * Configuración de cache offline
+ */
+export const CACHE_CONFIG = {
+  CACHE_NAME: 'casa-colchones-v1',
+  DATA_CACHE_NAME: 'casa-colchones-data-v1',
+  MAX_AGE: 7 * 24 * 60 * 60 * 1000, // 7 días en milisegundos
+  CLEANUP_INTERVAL: 24 * 60 * 60 * 1000 // 24 horas
+} as const;
+
+/**
+ * Eventos personalizados para la aplicación
+ */
+export const CUSTOM_EVENTS = {
+  CONNECTION_CHANGE: 'connectionchange',
+  SYNC_COMPLETE: 'syncComplete',
+  DATA_UPDATED: 'dataUpdated',
+  USER_LOGOUT: 'userLogout',
+  PWA_INSTALL_AVAILABLE: 'pwaInstallAvailable'
+} as const;
+
+/**
+ * Configuración de imágenes offline
+ */
+export const IMAGE_CONFIG = {
+  PLACEHOLDER_URL: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop',
+  FALLBACK_URLS: {
+    COLCHONES: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop',
+    SOMMIERS: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop',
+    RESPALDOS: 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop',
+    ALMOHADAS: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=300&fit=crop',
+    OTROS: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop'
+  }
 } as const;

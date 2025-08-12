@@ -58,6 +58,16 @@ const PaymentCalculatorModal: React.FC<PaymentCalculatorModalProps> = ({
     financeRate: number;
   }>(null);
 
+  // Generar IDs únicos para el formulario
+  const formIds = {
+    amount: `calc-amount-${Math.random().toString(36).substr(2, 9)}`,
+    cardType: `calc-card-type-${Math.random().toString(36).substr(2, 9)}`,
+    installments: `calc-installments-${Math.random().toString(36).substr(2, 9)}`,
+    settlement: `calc-settlement-${Math.random().toString(36).substr(2, 9)}`,
+    useMacro: `calc-use-macro-${Math.random().toString(36).substr(2, 9)}`,
+    useMiPyMe: `calc-use-mipyme-${Math.random().toString(36).substr(2, 9)}`,
+  };
+
   // Efecto para cargar datos precargados
   useEffect(() => {
     if (preloadData && isOpen) {
@@ -339,13 +349,15 @@ const PaymentCalculatorModal: React.FC<PaymentCalculatorModalProps> = ({
           {/* Formulario */}
           <div className="bg-gray-50 p-4 rounded-lg shadow space-y-4">
             <div className="flex flex-col">
-              <label className="text-sm font-medium mb-2">Monto neto a recibir (ARS)</label>
+              <label htmlFor={formIds.amount} className="text-sm font-medium mb-2">Monto neto a recibir (ARS)</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
                   $
                 </span>
                 <input
                   type="text"
+                  id={formIds.amount}
+                  name="amount"
                   inputMode="decimal"
                   onChange={handleInputChange}
                   placeholder="0"
@@ -357,8 +369,10 @@ const PaymentCalculatorModal: React.FC<PaymentCalculatorModalProps> = ({
             </div>
             
             <div className="flex flex-col">
-              <label className="text-sm font-medium">Tarjeta</label>
+              <label htmlFor={formIds.cardType} className="text-sm font-medium">Tarjeta</label>
               <select
+                id={formIds.cardType}
+                name="cardType"
                 value={cardType}
                 onChange={(e) => setCardType(e.target.value)}
                 className="border rounded-md p-2"
@@ -371,8 +385,10 @@ const PaymentCalculatorModal: React.FC<PaymentCalculatorModalProps> = ({
             </div>
             
             <div className="flex flex-col">
-              <label className="text-sm font-medium">Número de cuotas</label>
+              <label htmlFor={formIds.installments} className="text-sm font-medium">Número de cuotas</label>
               <select
+                id={formIds.installments}
+                name="installments"
                 value={installments}
                 onChange={(e) => setInstallments(parseInt(e.target.value))}
                 className="border rounded-md p-2"
@@ -390,8 +406,10 @@ const PaymentCalculatorModal: React.FC<PaymentCalculatorModalProps> = ({
             </div>
             
             <div className="flex flex-col">
-              <label className="text-sm font-medium">Plazo de acreditación</label>
+              <label htmlFor={formIds.settlement} className="text-sm font-medium">Plazo de acreditación</label>
               <select
+                id={formIds.settlement}
+                name="settlement"
                 value={settlement}
                 onChange={(e) => setSettlement(parseInt(e.target.value))}
                 className="border rounded-md p-2"
@@ -409,6 +427,8 @@ const PaymentCalculatorModal: React.FC<PaymentCalculatorModalProps> = ({
               <label className="flex items-center space-x-2">
                 <input
                   type="checkbox"
+                  id={formIds.useMacro}
+                  name="useMacro"
                   className="accent-blue-600"
                   checked={useMacro}
                   onChange={(e) => setUseMacro(e.target.checked)}
@@ -419,6 +439,8 @@ const PaymentCalculatorModal: React.FC<PaymentCalculatorModalProps> = ({
               <label className="flex items-center space-x-2">
                 <input
                   type="checkbox"
+                  id={formIds.useMiPyMe}
+                  name="useMiPyMe"
                   className="accent-blue-600"
                   checked={useMiPyMe}
                   onChange={(e) => setUseMiPyMe(e.target.checked)}

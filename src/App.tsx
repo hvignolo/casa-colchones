@@ -27,7 +27,10 @@ import ProductDetailModal from "./ProductDetailModal";
 import PaymentCalculatorModal from "./PaymentCalculatorModal";
 import SettingsModal from "./SettingsModal";
 import CartolaModal from "./CartolaModal";
+import ConnectionIndicator from "./ConnectionIndicator";
+import { useOffline } from "./useOffline";
 import { productToCartolaData, getCartolaStyleByProductType } from "./cartolaIntegration";
+import { ProductImage } from "./ProductImage";
 
 // Tipos para la integración
 interface CalculatorPreloadData {
@@ -72,14 +75,170 @@ const App: React.FC = () => {
   const [calculatorPreloadData, setCalculatorPreloadData] = useState<CalculatorPreloadData | undefined>(undefined);
   const [cartolaPreloadData, setCartolaPreloadData] = useState<any>(undefined);
 
-  // Verificar si hay usuario logueado al cargar
+  // Hook para funcionalidad offline
+  const {
+    isOnline,
+    isLoading: offlineLoading,
+    saveProductsOffline,
+    loadProductsOffline,
+    saveStoreDataOffline,
+    loadStoreDataOffline,
+    saveUserOffline,
+    loadUserOffline,
+    loadAllUsersOffline,
+    addOfflineAction,
+    clearOldData
+  } = useOffline();
+
+  // Datos de la tienda con persistencia offline
+  const [storeData, setStoreData] = useState<StoreData>(DEFAULT_STORE_DATA);
+
+  // Datos de productos con persistencia offline
+  const [products, setProducts] = useState<Product[]>([]);
+
+  // Registrar Service Worker - Versión para producción y GitHub Pages
   useEffect(() => {
-    const savedUser = localStorage.getItem("currentUser");
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-      setShowLogin(false);
+    // Habilitar Service Worker en producción
+    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+      // Usar la ruta correcta basada en PUBLIC_URL
+      const swUrl = `${process.env.PUBLIC_URL}/sw.js`;
+      
+      navigator.serviceWorker
+        .register(swUrl)
+        .then((registration) => {
+          console.log('Service Worker registrado:', registration.scope);
+          
+          // Verificar actualizaciones cada hora
+          setInterval(() => {
+            registration.update();
+          }, 1000 * 60 * 60);
+        })
+        .catch((error) => {
+          console.log('Error registrando Service Worker:', error);
+        });
+    } else {
+      console.log('Service Worker deshabilitado en desarrollo');
     }
   }, []);
+
+  // Cargar usuario al iniciar
+  useEffect(() => {
+    const loadInitialUser = async () => {
+      const savedUserData = localStorage.getItem("currentUser");
+      if (savedUserData) {
+        try {
+          const savedUser = JSON.parse(savedUserData);
+          
+          // Verificar que el usuario existe offline
+          const offlineUser = await loadUserOffline(savedUser.username);
+          if (offlineUser) {
+            setCurrentUser(offlineUser);
+            setShowLogin(false);
+          } else {
+            // Si no existe offline, usar los datos guardados y guardarlo offline
+            await saveUserOffline(savedUser);
+            setCurrentUser(savedUser);
+            setShowLogin(false);
+          }
+        } catch (error) {
+          console.error('Error loading user:', error);
+          // Fallback al usuario guardado en localStorage
+          setCurrentUser(JSON.parse(savedUserData));
+          setShowLogin(false);
+        }
+      }
+    };
+
+    loadInitialUser();
+  }, [loadUserOffline, saveUserOffline]);
+
+  // Cargar datos cuando cambie el usuario
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!currentUser) return;
+
+      try {
+        // Cargar datos de la tienda
+        const offlineStoreData = await loadStoreDataOffline(currentUser.username);
+        if (offlineStoreData) {
+          setStoreData(offlineStoreData);
+        } else {
+          // Si no hay datos offline, usar los datos por defecto con el nombre del negocio
+          const defaultStoreWithName = {
+            ...DEFAULT_STORE_DATA,
+            name: currentUser.businessName,
+          };
+          setStoreData(defaultStoreWithName);
+          await saveStoreDataOffline(defaultStoreWithName, currentUser.username);
+        }
+
+        // Cargar productos
+        const offlineProducts = await loadProductsOffline(currentUser.username);
+        if (offlineProducts.length > 0) {
+          setProducts(offlineProducts);
+        } else {
+          // Si no hay productos offline, usar los productos por defecto
+          setProducts(defaultProducts);
+          await saveProductsOffline(defaultProducts, currentUser.username);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        // Fallback a localStorage
+        const fallbackStoreData = loadFromLocalStorage("storeData", {
+          ...DEFAULT_STORE_DATA,
+          name: currentUser.businessName,
+        });
+        setStoreData(fallbackStoreData);
+        
+        const fallbackProducts = loadFromLocalStorage("products", defaultProducts);
+        setProducts(fallbackProducts);
+      }
+    };
+
+    loadUserData();
+  }, [currentUser, loadStoreDataOffline, saveStoreDataOffline, loadProductsOffline, saveProductsOffline]);
+
+  // Guardar datos automáticamente offline
+  useEffect(() => {
+    const saveData = async () => {
+      if (currentUser && storeData.name && !offlineLoading) {
+        try {
+          await saveStoreDataOffline(storeData, currentUser.username);
+          // También guardar en localStorage como fallback
+          saveToLocalStorage("storeData", storeData);
+        } catch (error) {
+          console.error('Error saving store data offline:', error);
+        }
+      }
+    };
+
+    saveData();
+  }, [storeData, currentUser, saveStoreDataOffline, offlineLoading]);
+
+  useEffect(() => {
+    const saveData = async () => {
+      if (currentUser && products.length > 0 && !offlineLoading) {
+        try {
+          await saveProductsOffline(products, currentUser.username);
+          // También guardar en localStorage como fallback
+          saveToLocalStorage("products", products);
+        } catch (error) {
+          console.error('Error saving products offline:', error);
+        }
+      }
+    };
+
+    saveData();
+  }, [products, currentUser, saveProductsOffline, offlineLoading]);
+
+  // Limpiar datos antiguos periódicamente
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      clearOldData();
+    }, 24 * 60 * 60 * 1000); // Cada 24 horas
+
+    return () => clearInterval(cleanup);
+  }, [clearOldData]);
 
   // Funciones para localStorage con prefijo de usuario
   const getUserKey = (key: string) => `user_${currentUser?.username}_${key}`;
@@ -104,46 +263,64 @@ const App: React.FC = () => {
     }
   };
 
-  // Funciones de autenticación
-  const getUsers = (): Record<string, UserType> => {
+  // Funciones de autenticación con soporte offline
+  const getUsers = async (): Promise<Record<string, UserType>> => {
     try {
+      return await loadAllUsersOffline();
+    } catch (error) {
+      // Fallback a localStorage
       const users = localStorage.getItem("app_users");
       return users ? JSON.parse(users) : {};
-    } catch (error) {
-      return {};
     }
   };
 
-  const saveUsers = (users: Record<string, UserType>) => {
+  const saveUsers = async (users: Record<string, UserType>) => {
     try {
+      // Guardar cada usuario individualmente offline
+      for (const user of Object.values(users)) {
+        await saveUserOffline(user);
+      }
+      // También guardar en localStorage
       localStorage.setItem("app_users", JSON.stringify(users));
     } catch (error) {
       console.error("Error guardando usuarios:", error);
+      // Fallback a localStorage
+      localStorage.setItem("app_users", JSON.stringify(users));
     }
   };
 
-  const handleLogin = (username: string, password: string, businessName: string): boolean => {
-    const users = getUsers();
+  const handleLogin = async (username: string, password: string, businessName: string): Promise<boolean> => {
+    const users = await getUsers();
 
     // Determinar si es registro basado en si el usuario ya existe
     const isRegister = !users[username];
 
     if (isRegister) {
-      users[username] = {
+      const newUser: UserType = {
         username,
         password,
         businessName,
         registeredAt: new Date().toISOString(),
       };
-      saveUsers(users);
 
-      const newUser = users[username];
+      users[username] = newUser;
+      await saveUsers(users);
+
       setCurrentUser(newUser);
       localStorage.setItem("currentUser", JSON.stringify(newUser));
       setShowLogin(false);
       showToastMessage(
         `¡Bienvenido ${businessName}! Usuario creado exitosamente`
       );
+
+      // Registrar acción offline si no hay conexión
+      if (!isOnline) {
+        await addOfflineAction({
+          type: 'USER_REGISTER',
+          user: newUser
+        }, username);
+      }
+
       return true;
     } else {
       const user = users[username];
@@ -152,6 +329,15 @@ const App: React.FC = () => {
         localStorage.setItem("currentUser", JSON.stringify(user));
         setShowLogin(false);
         showToastMessage(`¡Bienvenido de vuelta, ${user.businessName}!`);
+
+        // Registrar acción offline si no hay conexión
+        if (!isOnline) {
+          await addOfflineAction({
+            type: 'USER_LOGIN',
+            user: user
+          }, username);
+        }
+
         return true;
       } else {
         return false;
@@ -159,8 +345,16 @@ const App: React.FC = () => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (window.confirm("¿Estás seguro que quieres cerrar sesión?")) {
+      // Registrar acción offline si no hay conexión
+      if (!isOnline && currentUser) {
+        await addOfflineAction({
+          type: 'USER_LOGOUT',
+          user: currentUser
+        }, currentUser.username);
+      }
+
       setCurrentUser(null);
       localStorage.removeItem("currentUser");
       setShowLogin(true);
@@ -172,48 +366,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Datos de la tienda con persistencia por usuario
-  const [storeData, setStoreData] = useState<StoreData>(() => {
-    if (!currentUser) return DEFAULT_STORE_DATA;
-    return loadFromLocalStorage("storeData", {
-      ...DEFAULT_STORE_DATA,
-      name: currentUser?.businessName || DEFAULT_STORE_DATA.name,
-    });
-  });
-
-  // Datos de productos con persistencia por usuario
-  const [products, setProducts] = useState<Product[]>(() => {
-    if (!currentUser) return [];
-    return loadFromLocalStorage("products", defaultProducts);
-  });
-
-  // Recargar datos cuando cambia el usuario
-  useEffect(() => {
-    if (currentUser) {
-      const userData = loadFromLocalStorage("storeData", {
-        ...DEFAULT_STORE_DATA,
-        name: currentUser.businessName,
-      });
-      setStoreData(userData);
-
-      const userProducts = loadFromLocalStorage("products", defaultProducts);
-      setProducts(userProducts);
-    }
-  }, [currentUser]);
-
-  // Guardar datos automáticamente cuando cambien
-  useEffect(() => {
-    if (currentUser && storeData.name) {
-      saveToLocalStorage("storeData", storeData);
-    }
-  }, [storeData, currentUser]);
-
-  useEffect(() => {
-    if (currentUser && products.length > 0) {
-      saveToLocalStorage("products", products);
-    }
-  }, [products, currentUser]);
-
   // Función para formatear precios con punto como separador de miles y coma
   // como separador decimal, usando dos decimales.
   const formatPrice = (value: number) => {
@@ -224,12 +376,12 @@ const App: React.FC = () => {
   };
 
   // Importar lista de precios desde un archivo CSV
-  const importPriceList = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const importPriceList = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const text = e.target?.result as string;
         const lines = text.split(/\r?\n/).filter((ln) => ln.trim());
@@ -246,36 +398,42 @@ const App: React.FC = () => {
           }
         });
         
-        setProducts((prevProducts) => {
-          let updated = prevProducts.map((p) => {
-            if (p.tipo === "SOMMIERS") return p;
-            const newPrice = priceMap[p.codigo];
-            if (newPrice != null) {
-              const contadoPublic = Math.round((newPrice * 2 + Number.EPSILON) * 100) / 100;
-              const newTarjeta = Math.round((contadoPublic * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
-              return { ...p, precioContado: contadoPublic, precioTarjeta: newTarjeta };
+        const updatedProducts = products.map((p) => {
+          if (p.tipo === "SOMMIERS") return p;
+          const newPrice = priceMap[p.codigo];
+          if (newPrice != null) {
+            const contadoPublic = Math.round((newPrice * 2 + Number.EPSILON) * 100) / 100;
+            const newTarjeta = Math.round((contadoPublic * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
+            return { ...p, precioContado: contadoPublic, precioTarjeta: newTarjeta };
+          }
+          return p;
+        }).map((p) => {
+          if (p.tipo !== "SOMMIERS") return p;
+          const combo = SOMMIER_MAPPING[p.codigo];
+          if (!combo) return p;
+          let sum = 0;
+          combo.forEach((code) => {
+            const item = products.find((it) => it.codigo === code);
+            if (item) {
+              sum += item.precioContado;
             }
-            return p;
           });
-          
-          updated = updated.map((p) => {
-            if (p.tipo !== "SOMMIERS") return p;
-            const combo = SOMMIER_MAPPING[p.codigo];
-            if (!combo) return p;
-            let sum = 0;
-            combo.forEach((code) => {
-              const item = updated.find((it) => it.codigo === code);
-              if (item) {
-                sum += item.precioContado;
-              }
-            });
-            sum = Math.round((sum + Number.EPSILON) * 100) / 100;
-            const newTarjeta = Math.round((sum * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
-            return { ...p, precioContado: sum, precioTarjeta: newTarjeta };
-          });
-          
-          return updated;
+          sum = Math.round((sum + Number.EPSILON) * 100) / 100;
+          const newTarjeta = Math.round((sum * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
+          return { ...p, precioContado: sum, precioTarjeta: newTarjeta };
         });
+
+        setProducts(updatedProducts);
+
+        // Registrar acción offline si no hay conexión
+        if (!isOnline && currentUser) {
+          await addOfflineAction({
+            type: 'IMPORT_PRICES',
+            priceMap,
+            timestamp: Date.now()
+          }, currentUser.username);
+        }
+
         showToastMessage(SUCCESS_MESSAGES.PRICES_UPDATED);
       } catch (error) {
         console.error(error);
@@ -314,18 +472,35 @@ const App: React.FC = () => {
     return filtered;
   }, [activeFilter, searchQuery, products]);
 
-  const handleDeleteProduct = (id: number) => {
+  const handleDeleteProduct = async (id: number) => {
     if (window.confirm(CONFIRMATION_MESSAGES.DELETE_PRODUCT)) {
-      setProducts(products.filter((p) => p.id !== id));
+      const updatedProducts = products.filter((p) => p.id !== id);
+      setProducts(updatedProducts);
+
+      // Registrar acción offline si no hay conexión
+      if (!isOnline && currentUser) {
+        await addOfflineAction({
+          type: 'DELETE_PRODUCT',
+          productId: id
+        }, currentUser.username);
+      }
     }
   };
 
-  const handleSaveProduct = (productData: Omit<Product, 'id'>) => {
+  const handleSaveProduct = async (productData: Omit<Product, 'id'>) => {
     const newProduct = {
       ...productData,
       id: Math.max(...products.map((p) => p.id), 0) + 1,
     };
     setProducts([...products, newProduct]);
+
+    // Registrar acción offline si no hay conexión
+    if (!isOnline && currentUser) {
+      await addOfflineAction({
+        type: 'ADD_PRODUCT',
+        product: newProduct
+      }, currentUser.username);
+    }
   };
 
   const handleViewProduct = (product: Product) => {
@@ -366,7 +541,7 @@ const App: React.FC = () => {
   };
 
   // Funciones para exportar/importar datos
-  const exportData = () => {
+  const exportData = async () => {
     const data = {
       products,
       storeData,
@@ -386,15 +561,23 @@ const App: React.FC = () => {
     a.click();
     URL.revokeObjectURL(url);
 
+    // Registrar acción offline si no hay conexión
+    if (!isOnline && currentUser) {
+      await addOfflineAction({
+        type: 'EXPORT_DATA',
+        timestamp: Date.now()
+      }, currentUser.username);
+    }
+
     showToastMessage(SUCCESS_MESSAGES.DATA_EXPORTED);
   };
 
-  const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const importData = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const data = JSON.parse(e.target?.result as string);
 
@@ -405,6 +588,15 @@ const App: React.FC = () => {
           setStoreData(data.storeData);
         }
 
+        // Registrar acción offline si no hay conexión
+        if (!isOnline && currentUser) {
+          await addOfflineAction({
+            type: 'IMPORT_DATA',
+            data: data,
+            timestamp: Date.now()
+          }, currentUser.username);
+        }
+
         showToastMessage(SUCCESS_MESSAGES.DATA_IMPORTED);
       } catch (error) {
         showToastMessage(ERROR_MESSAGES.INVALID_FILE);
@@ -413,13 +605,24 @@ const App: React.FC = () => {
     reader.readAsText(file);
   };
 
-  const resetData = () => {
+  const resetData = async () => {
     if (window.confirm(CONFIRMATION_MESSAGES.RESET_DATA)) {
-      setProducts(defaultProducts);
-      setStoreData({
+      const defaultStoreWithName = {
         ...DEFAULT_STORE_DATA,
         name: currentUser?.businessName || DEFAULT_STORE_DATA.name,
-      });
+      };
+
+      setProducts(defaultProducts);
+      setStoreData(defaultStoreWithName);
+
+      // Registrar acción offline si no hay conexión
+      if (!isOnline && currentUser) {
+        await addOfflineAction({
+          type: 'RESET_DATA',
+          timestamp: Date.now()
+        }, currentUser.username);
+      }
+
       showToastMessage(SUCCESS_MESSAGES.DATA_RESET);
     }
   };
@@ -475,6 +678,8 @@ const App: React.FC = () => {
                   {currentUser.username}
                 </span>
               </div>
+              {/* Indicador de conexión */}
+              <ConnectionIndicator className="ml-4" />
             </div>
             <div className="flex items-center gap-2">
               {/* Botón de calculadora para abrir el modal de cuotas */}
@@ -517,11 +722,23 @@ const App: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
+              id="main-search-input"
+              name="search"
               placeholder="Buscar por código, nombre, marca..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+              autoComplete="off"
             />
+            {/* Indicador de modo offline en el search bar */}
+            {!isOnline && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="flex items-center gap-1 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-md">
+                  <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
+                  <span>Offline</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -553,7 +770,20 @@ const App: React.FC = () => {
 
       {/* Products Table */}
       <main className="pb-8">
-        {filteredProducts.length === 0 ? (
+        {/* Loading indicator */}
+        {offlineLoading && (
+          <div className="flex justify-center items-center py-8">
+            <div className="flex items-center gap-3 text-blue-600">
+              <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+              <span>Cargando datos...</span>
+            </div>
+          </div>
+        )}
+
+        {filteredProducts.length === 0 && !offlineLoading ? (
           <div className="text-center py-12 px-4">
             <div className="text-gray-400 mb-4">
               <Search className="w-12 h-12 mx-auto" />
@@ -562,6 +792,13 @@ const App: React.FC = () => {
             <p className="text-gray-400 text-sm mt-2">
               Intenta con otros términos de búsqueda
             </p>
+            {!isOnline && (
+              <div className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                <p className="text-orange-700 text-sm">
+                  <strong>Modo offline:</strong> Solo se muestran productos guardados localmente
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <>
@@ -607,10 +844,12 @@ const App: React.FC = () => {
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
                               <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                <img
+                                <ProductImage
                                   src={product.image}
                                   alt={product.nombre}
-                                  className="w-full h-full object-cover"
+                                  tipo={product.tipo}
+                                  className="w-full h-full"
+                                  size="small"
                                 />
                               </div>
                               <div className="min-w-0">
@@ -669,10 +908,12 @@ const App: React.FC = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      <img
+                      <ProductImage
                         src={product.image}
                         alt={product.nombre}
-                        className="w-full h-full object-cover"
+                        tipo={product.tipo}
+                        className="w-full h-full"
+                        size="medium"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -732,10 +973,12 @@ const App: React.FC = () => {
                 >
                   <div className="flex gap-3">
                     <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      <img
+                      <ProductImage
                         src={product.image}
                         alt={product.nombre}
-                        className="w-full h-full object-cover"
+                        tipo={product.tipo}
+                        className="w-full h-full"
+                        size="medium"
                       />
                     </div>
                     <div className="flex-1 min-w-0">

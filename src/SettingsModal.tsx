@@ -58,6 +58,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
+  // Generar IDs únicos para los formularios
+  const generateId = (base: string) => `${base}-${Math.random().toString(36).substr(2, 9)}`;
+
   // Componente ProductForm interno
   const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel }) => {
     const [formData, setFormData] = useState(
@@ -75,6 +78,20 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       }
     );
 
+    // IDs únicos para este formulario
+    const formIds = {
+      codigo: generateId('product-codigo'),
+      nombre: generateId('product-nombre'),
+      marca: generateId('product-marca'),
+      tipo: generateId('product-tipo'),
+      subtipo: generateId('product-subtipo'),
+      medidas: generateId('product-medidas'),
+      precioContado: generateId('product-precio-contado'),
+      precioTarjeta: generateId('product-precio-tarjeta'),
+      image: generateId('product-image'),
+      detalles: generateId('product-detalles'),
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       onSave({
@@ -89,56 +106,67 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor={formIds.codigo} className="block text-sm font-medium text-gray-700 mb-1">
                 Código
               </label>
               <input
                 type="text"
+                id={formIds.codigo}
+                name="codigo"
                 value={formData.codigo}
                 onChange={(e) =>
                   setFormData({ ...formData, codigo: e.target.value })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                autoComplete="off"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor={formIds.marca} className="block text-sm font-medium text-gray-700 mb-1">
                 Marca
               </label>
               <input
                 type="text"
+                id={formIds.marca}
+                name="marca"
                 value={formData.marca}
                 onChange={(e) =>
                   setFormData({ ...formData, marca: e.target.value })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                autoComplete="organization"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={formIds.nombre} className="block text-sm font-medium text-gray-700 mb-1">
               Nombre
             </label>
             <input
               type="text"
+              id={formIds.nombre}
+              name="nombre"
               value={formData.nombre}
               onChange={(e) =>
                 setFormData({ ...formData, nombre: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+              autoComplete="off"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor={formIds.tipo} className="block text-sm font-medium text-gray-700 mb-1">
                 Tipo
               </label>
               <select
+                id={formIds.tipo}
+                name="tipo"
                 value={formData.tipo}
                 onChange={(e) =>
                   setFormData({ ...formData, tipo: e.target.value })
@@ -153,27 +181,32 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor={formIds.subtipo} className="block text-sm font-medium text-gray-700 mb-1">
                 Subtipo
               </label>
               <input
                 type="text"
+                id={formIds.subtipo}
+                name="subtipo"
                 value={formData.subtipo}
                 onChange={(e) =>
                   setFormData({ ...formData, subtipo: e.target.value })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Ej: Viscoelástico, Resortes, etc."
+                autoComplete="off"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={formIds.medidas} className="block text-sm font-medium text-gray-700 mb-1">
               Medidas
             </label>
             <input
               type="text"
+              id={formIds.medidas}
+              name="medidas"
               value={formData.medidas}
               onChange={(e) =>
                 setFormData({ ...formData, medidas: e.target.value })
@@ -181,60 +214,74 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Ej: 2.00 x 1.40 x 0.25m"
               required
+              autoComplete="off"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor={formIds.precioContado} className="block text-sm font-medium text-gray-700 mb-1">
                 Precio Contado
               </label>
               <input
                 type="number"
+                id={formIds.precioContado}
+                name="precioContado"
                 value={formData.precioContado}
                 onChange={(e) =>
                   setFormData({ ...formData, precioContado: Number(e.target.value) })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                min="0"
+                step="0.01"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor={formIds.precioTarjeta} className="block text-sm font-medium text-gray-700 mb-1">
                 Precio Tarjeta
               </label>
               <input
                 type="number"
+                id={formIds.precioTarjeta}
+                name="precioTarjeta"
                 value={formData.precioTarjeta}
                 onChange={(e) =>
                   setFormData({ ...formData, precioTarjeta: Number(e.target.value) })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                min="0"
+                step="0.01"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={formIds.image} className="block text-sm font-medium text-gray-700 mb-1">
               URL de Imagen
             </label>
             <input
               type="url"
+              id={formIds.image}
+              name="image"
               value={formData.image}
               onChange={(e) =>
                 setFormData({ ...formData, image: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="https://..."
+              autoComplete="url"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={formIds.detalles} className="block text-sm font-medium text-gray-700 mb-1">
               Detalles
             </label>
             <textarea
+              id={formIds.detalles}
+              name="detalles"
               value={formData.detalles}
               onChange={(e) =>
                 setFormData({ ...formData, detalles: e.target.value })
@@ -271,6 +318,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const StoreForm: React.FC = () => {
     const [formData, setFormData] = useState(storeData);
 
+    // IDs únicos para este formulario
+    const formIds = {
+      name: generateId('store-name'),
+      location: generateId('store-location'),
+      phone: generateId('store-phone'),
+      email: generateId('store-email'),
+      hours: generateId('store-hours'),
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       onUpdateStoreData(formData);
@@ -285,71 +341,85 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       <div className="space-y-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={formIds.name} className="block text-sm font-medium text-gray-700 mb-1">
               Nombre de la Tienda
             </label>
             <input
               type="text"
+              id={formIds.name}
+              name="name"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+              autoComplete="organization"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={formIds.location} className="block text-sm font-medium text-gray-700 mb-1">
               Ubicación
             </label>
             <input
               type="text"
+              id={formIds.location}
+              name="location"
               value={formData.location}
               onChange={(e) =>
                 setFormData({ ...formData, location: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+              autoComplete="street-address"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={formIds.phone} className="block text-sm font-medium text-gray-700 mb-1">
               Teléfono
             </label>
             <input
               type="tel"
+              id={formIds.phone}
+              name="phone"
               value={formData.phone}
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+              autoComplete="tel"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={formIds.email} className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
             <input
               type="email"
+              id={formIds.email}
+              name="email"
               value={formData.email}
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+              autoComplete="email"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={formIds.hours} className="block text-sm font-medium text-gray-700 mb-1">
               Horarios
             </label>
             <input
               type="text"
+              id={formIds.hours}
+              name="hours"
               value={formData.hours}
               onChange={(e) =>
                 setFormData({ ...formData, hours: e.target.value })
@@ -357,6 +427,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Ej: Lun-Vie 9:00-18:00"
               required
+              autoComplete="off"
             />
           </div>
 
@@ -387,6 +458,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const handleCancelProductForm = () => {
     setShowProductForm(false);
     setEditingProduct(null);
+  };
+
+  // IDs únicos para inputs de archivo
+  const fileInputIds = {
+    import: generateId('import-file'),
+    importPrices: generateId('import-prices-file'),
   };
 
   // Función para renderizar el contenido según la vista
@@ -464,12 +541,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                       <button
                         onClick={() => handleEditProductClick(product)}
                         className="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                        title="Editar producto"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => onDeleteProduct(product.id)}
                         className="p-1 text-red-600 hover:bg-red-100 rounded"
+                        title="Eliminar producto"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -539,10 +618,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   accept=".json"
                   onChange={onImportData}
                   className="hidden"
-                  id="import-file"
+                  id={fileInputIds.import}
                 />
                 <label
-                  htmlFor="import-file"
+                  htmlFor={fileInputIds.import}
                   className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors cursor-pointer inline-block"
                 >
                   📤 Subir Backup
@@ -618,10 +697,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   accept=".csv"
                   onChange={onImportPriceList}
                   className="hidden"
-                  id="import-prices-file"
+                  id={fileInputIds.importPrices}
                 />
                 <label
-                  htmlFor="import-prices-file"
+                  htmlFor={fileInputIds.importPrices}
                   className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-700 transition-colors cursor-pointer inline-block"
                 >
                   💲 Importar Precios
