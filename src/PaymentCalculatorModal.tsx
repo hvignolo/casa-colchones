@@ -85,7 +85,7 @@ const PaymentCalculatorModal: React.FC<PaymentCalculatorModalProps> = ({
         handleCalculateWithData(preloadData);
       }, 100);
     }
-  }, [preloadData, isOpen]);
+  }, [preloadData, isOpen]); // handleCalculateWithData is stable
 
   // Formatear valor para mostrar en el input
   const formatInputValue = (value: string): string => {
@@ -225,7 +225,7 @@ const PaymentCalculatorModal: React.FC<PaymentCalculatorModalProps> = ({
     });
     
     return possibilities;
-  }, [cardType, settlement, useMacro, useMiPyMe]);
+  }, [cardType, settlement, useMacro, useMiPyMe]); // getRateFor is stable
 
   // Ajustar la selección actual si no está entre las opciones disponibles
   useEffect(() => {
@@ -335,9 +335,9 @@ const PaymentCalculatorModal: React.FC<PaymentCalculatorModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-xl shadow-xl w-11/12 max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
-        <div className="flex justify-between items-center px-4 py-3 border-b">
-          <h3 className="text-lg font-semibold">Calculadora de cuotas</h3>
+      <div className="bg-white rounded-xl shadow-xl w-11/12 sm:w-10/12 max-w-3xl max-h-[90vh] flex flex-col overflow-hidden mx-4">
+        <div className="flex justify-between items-center px-4 sm:px-6 py-3 border-b">
+          <h3 className="text-lg sm:text-xl font-semibold">Calculadora de cuotas</h3>
           <button
             onClick={onClose}
             className="p-1 hover:bg-gray-100 rounded-full"
@@ -345,7 +345,7 @@ const PaymentCalculatorModal: React.FC<PaymentCalculatorModalProps> = ({
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Formulario */}
           <div className="bg-gray-50 p-4 rounded-lg shadow space-y-4">
             <div className="flex flex-col">
