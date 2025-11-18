@@ -31,6 +31,7 @@ import { useOffline } from "./useOffline";
 import { productToCartolaData, getCartolaStyleByProductType } from "./cartolaIntegration";
 import { ProductImage } from "./ProductImage";
 import { useAuth } from './contexts/AuthContext';
+import { convertXmlToCsv } from './xmlToCsvConverter';
 
 // Tipos para la integración
 interface CalculatorPreloadData {
@@ -246,6 +247,59 @@ const AdminDashboard: React.FC = () => {
     });
   };
 
+  // Función reutilizable para procesar contenido CSV
+  const processCSVContent = async (csvContent: string) => {
+    const lines = csvContent.split(/\r?\n/).filter((ln) => ln.trim());
+    const priceMap: Record<string, number> = {};
+    
+    lines.forEach((line) => {
+      const cols = line.split(",");
+      const codeRaw = cols[0]?.trim();
+      const priceStr = cols[3]?.trim();
+      
+      if (codeRaw && !isNaN(Number(codeRaw)) && priceStr && !isNaN(parseFloat(priceStr))) {
+        const normalizedCode = parseInt(codeRaw, 10).toString();
+        priceMap[normalizedCode] = parseFloat(priceStr);
+      }
+    });
+    
+    const updatedProducts = products.map((p) => {
+      if (p.tipo === "SOMMIERS") return p;
+      const newPrice = priceMap[p.codigo];
+      if (newPrice != null) {
+        const contadoPublic = Math.round((newPrice * 2 + Number.EPSILON) * 100) / 100;
+        const newTarjeta = Math.round((contadoPublic * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
+        return { ...p, precioContado: contadoPublic, precioTarjeta: newTarjeta };
+      }
+      return p;
+    }).map((p) => {
+      if (p.tipo !== "SOMMIERS") return p;
+      const combo = SOMMIER_MAPPING[p.codigo];
+      if (!combo) return p;
+      let sum = 0;
+      combo.forEach((code) => {
+        const item = products.find((it) => it.codigo === code);
+        if (item) {
+          sum += item.precioContado;
+        }
+      });
+      sum = Math.round((sum + Number.EPSILON) * 100) / 100;
+      const newTarjeta = Math.round((sum * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
+      return { ...p, precioContado: sum, precioTarjeta: newTarjeta };
+    });
+
+    setProducts(updatedProducts);
+
+    // Registrar acción offline si no hay conexión
+    if (!isOnline && currentUser) {
+      await addOfflineAction({
+        type: 'IMPORT_PRICES',
+        priceMap,
+        timestamp: Date.now()
+      }, currentUser.username);
+    }
+  };
+
   // Importar lista de precios desde un archivo CSV
   const importPriceList = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -255,60 +309,44 @@ const AdminDashboard: React.FC = () => {
     reader.onload = async (e) => {
       try {
         const text = e.target?.result as string;
-        const lines = text.split(/\r?\n/).filter((ln) => ln.trim());
-        const priceMap: Record<string, number> = {};
-        
-        lines.forEach((line) => {
-          const cols = line.split(",");
-          const codeRaw = cols[0]?.trim();
-          const priceStr = cols[3]?.trim();
-          
-          if (codeRaw && !isNaN(Number(codeRaw)) && priceStr && !isNaN(parseFloat(priceStr))) {
-            const normalizedCode = parseInt(codeRaw, 10).toString();
-            priceMap[normalizedCode] = parseFloat(priceStr);
-          }
-        });
-        
-        const updatedProducts = products.map((p) => {
-          if (p.tipo === "SOMMIERS") return p;
-          const newPrice = priceMap[p.codigo];
-          if (newPrice != null) {
-            const contadoPublic = Math.round((newPrice * 2 + Number.EPSILON) * 100) / 100;
-            const newTarjeta = Math.round((contadoPublic * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
-            return { ...p, precioContado: contadoPublic, precioTarjeta: newTarjeta };
-          }
-          return p;
-        }).map((p) => {
-          if (p.tipo !== "SOMMIERS") return p;
-          const combo = SOMMIER_MAPPING[p.codigo];
-          if (!combo) return p;
-          let sum = 0;
-          combo.forEach((code) => {
-            const item = products.find((it) => it.codigo === code);
-            if (item) {
-              sum += item.precioContado;
-            }
-          });
-          sum = Math.round((sum + Number.EPSILON) * 100) / 100;
-          const newTarjeta = Math.round((sum * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
-          return { ...p, precioContado: sum, precioTarjeta: newTarjeta };
-        });
-
-        setProducts(updatedProducts);
-
-        // Registrar acción offline si no hay conexión
-        if (!isOnline && currentUser) {
-          await addOfflineAction({
-            type: 'IMPORT_PRICES',
-            priceMap,
-            timestamp: Date.now()
-          }, currentUser.username);
-        }
-
+        await processCSVContent(text);
         showToastMessage(SUCCESS_MESSAGES.PRICES_UPDATED);
       } catch (error) {
         console.error(error);
         showToastMessage(ERROR_MESSAGES.INVALID_PRICES_FILE);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  // Importar lista de precios desde un archivo XML
+  const handleImportXmlPriceList = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const xmlContent = e.target?.result as string;
+        
+        // Convertir XML a CSV
+        const result = convertXmlToCsv(xmlContent);
+        
+        if (!result.success) {
+          showToastMessage(result.error || ERROR_MESSAGES.INVALID_XML_FILE);
+          return;
+        }
+
+        // Procesar el CSV generado usando la lógica existente
+        const csvContent = result.csvContent!;
+        await processCSVContent(csvContent);
+        
+        showToastMessage(
+          SUCCESS_MESSAGES.XML_PRICES_UPDATED(result.productsCount!)
+        );
+      } catch (error) {
+        console.error(error);
+        showToastMessage(ERROR_MESSAGES.INVALID_XML_FILE);
       }
     };
     reader.readAsText(file);
@@ -926,6 +964,7 @@ const AdminDashboard: React.FC = () => {
         onImportData={importData}
         onResetData={resetData}
         onImportPriceList={importPriceList}
+        onImportXmlPriceList={handleImportXmlPriceList}
         onShowToast={showToastMessage}
         formatPrice={formatPrice}
       />

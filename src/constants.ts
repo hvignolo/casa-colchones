@@ -418,7 +418,10 @@ export const SUCCESS_MESSAGES = {
   // NUEVOS MENSAJES PARA FUNCIONALIDAD OFFLINE
   SYNC_COMPLETE: '✅ Sincronización completada',
   OFFLINE_MODE_ACTIVE: '🔄 Modo offline activado - Los datos se guardarán localmente',
-  ONLINE_MODE_RESTORED: '🌐 Conexión restaurada - Sincronizando datos...'
+  ONLINE_MODE_RESTORED: '🌐 Conexión restaurada - Sincronizando datos...',
+  // NUEVOS MENSAJES PARA IMPORTACIÓN XML
+  XML_IMPORT_SUCCESS: (count: number) => `✓ ${count} productos procesados desde XML`,
+  XML_PRICES_UPDATED: (count: number) => `¡Precios actualizados exitosamente! (${count} productos procesados desde XML)`
 } as const;
 
 /**
@@ -435,12 +438,26 @@ export const ERROR_MESSAGES = {
   BUSINESS_NAME_TOO_SHORT: 'El nombre del negocio debe tener al menos 3 caracteres',
   INVALID_FILE: 'Error al procesar el archivo. Verifica el formato.',
   INVALID_PRICES_FILE: 'Error al actualizar precios. Verifica el archivo.',
+  INVALID_XML_FILE: 'Error al procesar el archivo XML. Verifica el formato.',
   GENERIC_ERROR: 'Ha ocurrido un error inesperado',
   // NUEVOS MENSAJES PARA FUNCIONALIDAD OFFLINE
   NETWORK_ERROR: '❌ Error de conexión - Funcionando en modo offline',
   SYNC_ERROR: '❌ Error durante la sincronización',
   STORAGE_ERROR: '❌ Error al guardar datos localmente',
   LOAD_ERROR: '❌ Error al cargar datos'
+} as const;
+
+/**
+ * Mensajes de error específicos para XML
+ */
+export const XML_ERROR_MESSAGES = {
+  INVALID_FILE_TYPE: 'El archivo debe tener extensión .xml',
+  PARSE_ERROR: 'Error al parsear el archivo XML. Verifica que el formato sea válido',
+  NO_PRODUCTS_FOUND: 'No se encontraron productos válidos en el archivo XML',
+  MISSING_REQUIRED_FIELDS: 'Algunos productos no tienen los campos requeridos (código y precio)',
+  ENCODING_ERROR: 'Error de codificación. Asegúrate de que el archivo use UTF-8',
+  EMPTY_FILE: 'El archivo XML está vacío',
+  MALFORMED_XML: 'El XML está mal formado. Verifica que todas las etiquetas estén cerradas correctamente',
 } as const;
 
 /**

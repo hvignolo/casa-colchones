@@ -33,6 +33,7 @@ interface SettingsModalProps {
   onImportData: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onResetData: () => void;
   onImportPriceList: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onImportXmlPriceList: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onShowToast: (message: string) => void;
   formatPrice: (value: number) => string;
 }
@@ -51,6 +52,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onImportData,
   onResetData,
   onImportPriceList,
+  onImportXmlPriceList,
   onShowToast,
   formatPrice
 }) => {
@@ -464,6 +466,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const fileInputIds = {
     import: generateId('import-file'),
     importPrices: generateId('import-prices-file'),
+    importXmlPrices: generateId('import-xml-prices-file'),
   };
 
   // Función para renderizar el contenido según la vista
@@ -684,7 +687,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="space-y-4">
               <div className="bg-yellow-50 p-4 rounded-lg">
                 <h4 className="font-medium text-yellow-900 mb-2">
-                  Importar Lista de Precios
+                  Importar Lista de Precios (CSV)
                 </h4>
                 <p className="text-sm text-yellow-700 mb-3">
                   Selecciona un archivo CSV con la lista mayorista (código,
@@ -703,7 +706,32 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   htmlFor={fileInputIds.importPrices}
                   className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-700 transition-colors cursor-pointer inline-block"
                 >
-                  💲 Importar Precios
+                  💲 Importar CSV
+                </label>
+              </div>
+
+              <div className="bg-orange-50 p-4 rounded-lg">
+                <h4 className="font-medium text-orange-900 mb-2">
+                  Importar Lista de Precios (XML)
+                </h4>
+                <p className="text-sm text-orange-700 mb-3">
+                  Selecciona un archivo XML de tu proveedor para actualizar los
+                  precios automáticamente. El sistema detectará los campos
+                  relevantes (código, nombre, medida, precio) y convertirá el
+                  XML a formato compatible.
+                </p>
+                <input
+                  type="file"
+                  accept=".xml"
+                  onChange={onImportXmlPriceList}
+                  className="hidden"
+                  id={fileInputIds.importXmlPrices}
+                />
+                <label
+                  htmlFor={fileInputIds.importXmlPrices}
+                  className="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-700 transition-colors cursor-pointer inline-block"
+                >
+                  📄 Importar XML
                 </label>
               </div>
             </div>
