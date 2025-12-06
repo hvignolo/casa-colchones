@@ -85,12 +85,12 @@ const AdminDashboard: React.FC = () => {
     if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       // Usar la ruta correcta basada en PUBLIC_URL
       const swUrl = `${process.env.PUBLIC_URL}/sw.js`;
-      
+
       navigator.serviceWorker
         .register(swUrl)
         .then((registration) => {
           console.log('Service Worker registrado:', registration.scope);
-          
+
           // Verificar actualizaciones cada hora
           setInterval(() => {
             registration.update();
@@ -143,7 +143,7 @@ const AdminDashboard: React.FC = () => {
           name: currentUser.businessName,
         });
         setStoreData(fallbackStoreData);
-        
+
         const fallbackProducts = loadFromLocalStorage("products", defaultProducts);
         setProducts(fallbackProducts);
       }
@@ -251,18 +251,18 @@ const AdminDashboard: React.FC = () => {
   const processCSVContent = async (csvContent: string) => {
     const lines = csvContent.split(/\r?\n/).filter((ln) => ln.trim());
     const priceMap: Record<string, number> = {};
-    
+
     lines.forEach((line) => {
       const cols = line.split(",");
       const codeRaw = cols[0]?.trim();
       const priceStr = cols[3]?.trim();
-      
+
       if (codeRaw && !isNaN(Number(codeRaw)) && priceStr && !isNaN(parseFloat(priceStr))) {
         const normalizedCode = parseInt(codeRaw, 10).toString();
         priceMap[normalizedCode] = parseFloat(priceStr);
       }
     });
-    
+
     const updatedProducts = products.map((p) => {
       if (p.tipo === "SOMMIERS") return p;
       const newPrice = priceMap[p.codigo];
@@ -328,10 +328,10 @@ const AdminDashboard: React.FC = () => {
     reader.onload = async (e) => {
       try {
         const xmlContent = e.target?.result as string;
-        
+
         // Convertir XML a CSV
         const result = convertXmlToCsv(xmlContent);
-        
+
         if (!result.success) {
           showToastMessage(result.error || ERROR_MESSAGES.INVALID_XML_FILE);
           return;
@@ -340,7 +340,7 @@ const AdminDashboard: React.FC = () => {
         // Procesar el CSV generado usando la lógica existente
         const csvContent = result.csvContent!;
         await processCSVContent(csvContent);
-        
+
         showToastMessage(
           SUCCESS_MESSAGES.XML_PRICES_UPDATED(result.productsCount!)
         );
@@ -430,12 +430,12 @@ const AdminDashboard: React.FC = () => {
   const handleCreateCartolaFromProduct = (product: Product) => {
     const cartolaData = productToCartolaData(product);
     const estilo = getCartolaStyleByProductType(product.tipo);
-    
+
     setCartolaPreloadData({
       data: cartolaData,
       estilo: estilo
     });
-    
+
     // Cerrar el modal de detalle del producto antes de abrir la cartola
     setSelectedProduct(null);
     setShowCartola(true);
@@ -464,9 +464,8 @@ const AdminDashboard: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${currentUser?.username}-backup-${
-      new Date().toISOString().split("T")[0]
-    }.json`;
+    a.download = `${currentUser?.username}-backup-${new Date().toISOString().split("T")[0]
+      }.json`;
     a.click();
     URL.revokeObjectURL(url);
 
@@ -611,7 +610,7 @@ const AdminDashboard: React.FC = () => {
               <button
                 onClick={handleLogout}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                title="Cerrar sesión"
+                title="Logout"
               >
                 <LogOut className="w-6 h-6 text-gray-600" />
               </button>
@@ -655,11 +654,10 @@ const AdminDashboard: React.FC = () => {
               <button
                 key={chip.id}
                 onClick={() => setActiveFilter(chip.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all ${
-                  isActive
+                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all ${isActive
                     ? "bg-blue-600 text-white shadow-md"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 <IconComponent className="w-4 h-4" />
                 <span className="text-sm font-medium">{chip.label}</span>
@@ -959,7 +957,7 @@ const AdminDashboard: React.FC = () => {
         onUpdateStoreData={setStoreData}
         onSaveProduct={handleSaveProduct}
         onDeleteProduct={handleDeleteProduct}
-        onEditProduct={() => {}} // No se usa en este flujo simplificado
+        onEditProduct={() => { }} // No se usa en este flujo simplificado
         onExportData={exportData}
         onImportData={importData}
         onResetData={resetData}
@@ -970,8 +968,8 @@ const AdminDashboard: React.FC = () => {
       />
 
       {/* Calculator Modal */}
-      <PaymentCalculatorModal 
-        isOpen={showCalculator} 
+      <PaymentCalculatorModal
+        isOpen={showCalculator}
         onClose={() => {
           setShowCalculator(false);
           setCalculatorPreloadData(undefined);
@@ -980,8 +978,8 @@ const AdminDashboard: React.FC = () => {
       />
 
       {/* Cartola de precios Modal */}
-      <CartolaModal 
-        open={showCartola} 
+      <CartolaModal
+        open={showCartola}
         onClose={() => {
           setShowCartola(false);
           setCartolaPreloadData(undefined);

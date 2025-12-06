@@ -24,25 +24,25 @@ const PublicLayout: React.FC = () => {
             <Link to="/" className="flex items-center space-x-2">
               <Bed className="w-8 h-8 text-primary" />
               <span className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Casa Colchones
+                La Casa de los Colchones
               </span>
             </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 className="text-gray-700 hover:text-primary transition-colors font-medium text-sm lg:text-base"
               >
                 Inicio
               </Link>
-              <Link 
-                to="/products" 
+              <Link
+                to="/products"
                 className="text-gray-700 hover:text-primary transition-colors font-medium text-sm lg:text-base"
               >
                 Productos
               </Link>
-              <a 
+              <a
                 href="https://wa.me/5491123456789"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -60,7 +60,7 @@ const PublicLayout: React.FC = () => {
                 className="hidden sm:flex items-center space-x-1 bg-gradient-primary text-white px-4 py-2 rounded-full hover:shadow-lg transition-all font-medium"
               >
                 <User className="w-4 h-4" />
-                <span>Admin</span>
+                <span>Login</span>
               </button>
 
               {/* Mobile menu button */}
@@ -81,21 +81,21 @@ const PublicLayout: React.FC = () => {
           {isMobileMenuOpen && (
             <div className="md:hidden border-t border-gray-200 py-4">
               <div className="flex flex-col space-y-4">
-                <Link 
-                  to="/" 
+                <Link
+                  to="/"
                   className="text-gray-700 hover:text-primary transition-colors font-medium px-2"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Inicio
                 </Link>
-                <Link 
-                  to="/products" 
+                <Link
+                  to="/products"
                   className="text-gray-700 hover:text-primary transition-colors font-medium px-2"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Productos
                 </Link>
-                <a 
+                <a
                   href="https://wa.me/5491123456789"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -113,7 +113,7 @@ const PublicLayout: React.FC = () => {
                   className="flex items-center space-x-1 bg-gradient-primary text-white px-4 py-2 rounded-full font-medium mx-2 justify-center"
                 >
                   <User className="w-4 h-4" />
-                  <span>Admin</span>
+                  <span>Login</span>
                 </button>
               </div>
             </div>
@@ -134,10 +134,10 @@ const PublicLayout: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Bed className="w-6 h-6 text-primary" />
-                <span className="text-xl font-bold">Casa Colchones</span>
+                <span className="text-xl font-bold">La Casa de los Colchones</span>
               </div>
               <p className="text-gray-400 text-sm">
-                Tu tienda de confianza para el mejor descanso. 
+                Tu tienda de confianza para el mejor descanso.
                 Colchones de calidad premium para toda la familia.
               </p>
             </div>
@@ -152,7 +152,7 @@ const PublicLayout: React.FC = () => {
                 <Link to="/products" className="block text-gray-400 hover:text-white transition-colors text-sm">
                   Productos
                 </Link>
-                <a 
+                <a
                   href="https://wa.me/5491123456789"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -201,7 +201,7 @@ const PublicLayout: React.FC = () => {
           {/* Bottom Bar */}
           <div className="border-t border-gray-800 mt-8 pt-8 text-center">
             <p className="text-gray-400 text-sm">
-              © 2025 Casa Colchones. Todos los derechos reservados.
+              © 2025 La Casa de los Colchones. Todos los derechos reservados.
             </p>
           </div>
         </div>

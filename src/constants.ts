@@ -49,7 +49,7 @@ export const PRODUCT_TYPES = {
  */
 export const FILTER_IDS = {
   TODOS: 'TODOS',
-  COLCHONES: 'COLCHONES', 
+  COLCHONES: 'COLCHONES',
   SOMMIERS: 'SOMMIERS',
   RESORTES: 'RESORTES',
   ESPUMA: 'ESPUMA',
@@ -102,38 +102,38 @@ export const SOMMIER_MAPPING: Record<string, string[]> = {
 /**
  * Comisiones de viüMi por plazo de acreditación
  */
-export const VIUMI_COMMISSIONS: Record<number, number> = { 
-  2: 5.19, 
-  5: 4.59, 
-  10: 3.49, 
-  20: 2.05, 
-  40: 0.0 
+export const VIUMI_COMMISSIONS: Record<number, number> = {
+  2: 5.19,
+  5: 4.59,
+  10: 3.49,
+  20: 2.05,
+  40: 0.0
 };
 
 /**
  * Tasas de financiación de viüMi por cuotas
  */
-export const VIUMI_FINANCE: Record<number, number> = { 
-  1: 0.0, 
-  2: 0.0, 
-  3: 12.66, 
-  4: 0.0, 
-  5: 0.0, 
-  6: 21.01, 
-  7: 0.0, 
-  8: 0.0, 
-  9: 29.28, 
-  10: 0.0, 
-  11: 0.0, 
-  12: 35.79 
+export const VIUMI_FINANCE: Record<number, number> = {
+  1: 0.0,
+  2: 0.0,
+  3: 12.66,
+  4: 0.0,
+  5: 0.0,
+  6: 21.01,
+  7: 0.0,
+  8: 0.0,
+  9: 29.28,
+  10: 0.0,
+  11: 0.0,
+  12: 35.79
 };
 
 /**
  * Tasas de financiación MiPyME
  */
-export const MIPYME_FINANCE: Record<number, number> = { 
-  3: 5.93, 
-  6: 11.24 
+export const MIPYME_FINANCE: Record<number, number> = {
+  3: 5.93,
+  6: 11.24
 };
 
 /**
@@ -149,30 +149,30 @@ export const VIUMI_MACRO_PROMO: Record<number, Record<number, number>> = {
 /**
  * Comisiones de Tarjeta Naranja por plazo de acreditación
  */
-export const NARANJA_COMMISSIONS: Record<number, number> = { 
-  2: 5.79, 
-  5: 3.39, 
-  10: 3.39, 
-  20: 0.0, 
-  40: 0.0 
+export const NARANJA_COMMISSIONS: Record<number, number> = {
+  2: 5.79,
+  5: 3.39,
+  10: 3.39,
+  20: 0.0,
+  40: 0.0
 };
 
 /**
  * Tasas de financiación de Tarjeta Naranja por cuotas
  */
-export const NARANJA_FINANCE: Record<number, number> = { 
-  1: 0.0, 
-  2: 0.0, 
-  3: 10.39, 
-  4: 0.0, 
-  5: 0.0, 
-  6: 17.69, 
-  7: 0.0, 
-  8: 0.0, 
-  9: 23.52, 
-  10: 0.0, 
-  11: 0.0, 
-  12: 29.08 
+export const NARANJA_FINANCE: Record<number, number> = {
+  1: 0.0,
+  2: 0.0,
+  3: 10.39,
+  4: 0.0,
+  5: 0.0,
+  6: 17.69,
+  7: 0.0,
+  8: 0.0,
+  9: 23.52,
+  10: 0.0,
+  11: 0.0,
+  12: 29.08
 };
 
 /**
@@ -183,18 +183,18 @@ export const PAYWAY_COMMISSION = 1.8;
 /**
  * Coeficientes de Payway sin IVA por cuotas
  */
-export const PAYWAY_COEFF_NO_VAT: Record<number, number> = { 
-  2: 1.1062, 
-  3: 1.1449, 
-  4: 1.1844, 
-  5: 1.2248, 
-  6: 1.2660, 
-  7: 0.0, 
-  8: 0.0, 
-  9: 1.4141, 
-  10: 0.0, 
-  11: 0.0, 
-  12: 1.5575 
+export const PAYWAY_COEFF_NO_VAT: Record<number, number> = {
+  2: 1.1062,
+  3: 1.1449,
+  4: 1.1844,
+  5: 1.2248,
+  6: 1.2660,
+  7: 0.0,
+  8: 0.0,
+  9: 1.4141,
+  10: 0.0,
+  11: 0.0,
+  12: 1.5575
 };
 
 /**
@@ -316,7 +316,7 @@ export const REGEX_PATTERNS = {
  */
 export const BREAKPOINTS = {
   SM: '640px',
-  MD: '768px', 
+  MD: '768px',
   LG: '1024px',
   XL: '1280px',
   '2XL': '1536px'
@@ -338,7 +338,7 @@ export const Z_INDEX = {
 export const THEME_COLORS = {
   PRIMARY: {
     50: '#eff6ff',
-    100: '#dbeafe', 
+    100: '#dbeafe',
     500: '#3b82f6',
     600: '#2563eb',
     700: '#1d4ed8',
@@ -480,7 +480,7 @@ export const CONFIRMATION_MESSAGES = {
  * Configuración general de la aplicación
  */
 export const APP_CONFIG = {
-  NAME: 'Casa de Colchones',
+  NAME: 'La Casa de los Colchones',
   VERSION: '2.0.0', // Actualizada versión para PWA
   AUTHOR: 'Tu Empresa',
   DESCRIPTION: 'Sistema de gestión para tiendas de colchones con funcionalidad offline',
@@ -539,7 +539,7 @@ export const INDEXEDDB_CONFIG = {
   DB_VERSION: 1,
   STORES: {
     PRODUCTS: 'products',
-    STORE_DATA: 'storeData', 
+    STORE_DATA: 'storeData',
     USERS: 'users',
     SYNC_QUEUE: 'syncQueue',
     OFFLINE_ACTIONS: 'offlineActions',

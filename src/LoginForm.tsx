@@ -72,7 +72,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
           formData.password,
           formData.businessName
         );
-        
+
         if (!success) {
           setLoginError(
             loginMode === "login"
@@ -121,7 +121,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
             <Bed className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Casa de Colchones
+            La Casa de los Colchones
           </h1>
           <p className="text-gray-600">
             {loginMode === "login"
@@ -165,9 +165,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
               name="username"
               value={formData.username}
               onChange={(e) => handleInputChange("username", e.target.value)}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 ${
-                loginError ? "border-red-300" : "border-gray-300"
-              }`}
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 ${loginError ? "border-red-300" : "border-gray-300"
+                }`}
               placeholder="Ingresa tu usuario"
               required
               disabled={isLoading}
@@ -186,9 +185,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
               name="password"
               value={formData.password}
               onChange={(e) => handleInputChange("password", e.target.value)}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 ${
-                loginError ? "border-red-300" : "border-gray-300"
-              }`}
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 ${loginError ? "border-red-300" : "border-gray-300"
+                }`}
               placeholder="Ingresa tu contraseña"
               required
               disabled={isLoading}
@@ -208,9 +206,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
                 name="businessName"
                 value={formData.businessName}
                 onChange={(e) => handleInputChange("businessName", e.target.value)}
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 ${
-                  loginError ? "border-red-300" : "border-gray-300"
-                }`}
+                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 ${loginError ? "border-red-300" : "border-gray-300"
+                  }`}
                 placeholder="Ej: Casa de Colchones Miranda"
                 required
                 disabled={isLoading}
@@ -223,11 +220,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 ${
-              isLoading
+            className={`w-full py-3 px-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 ${isLoading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
-            } text-white`}
+              } text-white`}
           >
             {isLoading ? (
               <>

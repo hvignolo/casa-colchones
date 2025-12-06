@@ -38,7 +38,7 @@ const AdminLogin: React.FC = () => {
             <Link to="/" className="flex items-center space-x-2">
               <Bed className="w-8 h-8 text-primary" />
               <span className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Casa Colchones
+                La Casa de los Colchones
               </span>
             </Link>
             <Link
@@ -69,7 +69,7 @@ const AdminLogin: React.FC = () => {
 
           {/* Login Form */}
           <div className="bg-white rounded-2xl shadow-card p-8">
-            <LoginForm 
+            <LoginForm
               onLogin={handleLogin}
               onShowToast={showToastMessage}
             />

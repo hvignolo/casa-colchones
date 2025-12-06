@@ -30,17 +30,17 @@ const AppRouter: React.FC = () => {
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route 
-              path="/admin" 
+            <Route
+              path="/admin"
               element={
                 <ProtectedRoute>
                   <AdminDashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
 
             {/* Redirect /admin/* to /admin for now */}
-            <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
+            <Route path="/admin/*" element={<Navigate to="/admin/login" replace />} />
 
             {/* 404 Page */}
             <Route path="*" element={<NotFoundPage />} />

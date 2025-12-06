@@ -25,7 +25,7 @@ const HomePage: React.FC = () => {
                 <span className="block">para vos</span>
               </h1>
               <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-lg mx-auto lg:mx-0">
-                Descubrí nuestra colección premium de colchones, sommiers y accesorios. 
+                Descubrí nuestra colección premium de colchones, sommiers y accesorios.
                 Calidad garantizada para el descanso que te merecés.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
@@ -69,7 +69,7 @@ const HomePage: React.FC = () => {
         <div className="mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              ¿Por qué elegir Casa Colchones?
+              ¿Por qué elegir La Casa de los Colchones?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Más de 10 años brindando el mejor descanso con productos de calidad premium
@@ -129,9 +129,9 @@ const HomePage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredProducts.map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
+              <ProductCard
+                key={product.id}
+                product={product}
                 variant="featured"
               />
             ))}
