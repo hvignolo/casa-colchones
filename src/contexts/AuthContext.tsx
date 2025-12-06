@@ -46,54 +46,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loadUser();
   }, []);
 
-  const getUsers = async (): Promise<Record<string, User>> => {
-    try {
-      const users = localStorage.getItem("app_users");
-      return users ? JSON.parse(users) : {};
-    } catch (error) {
-      console.error('Error loading users:', error);
-      return {};
-    }
-  };
 
-  const saveUsers = async (users: Record<string, User>) => {
-    try {
-      localStorage.setItem("app_users", JSON.stringify(users));
-    } catch (error) {
-      console.error("Error saving users:", error);
-    }
-  };
 
   const login = async (username: string, password: string, businessName: string): Promise<boolean> => {
     try {
-      const users = await getUsers();
-      const isRegister = !users[username];
-
-      if (isRegister) {
-        // Register new user
-        const newUser: User = {
-          username,
-          password,
-          businessName,
+      // Hardcoded credentials check
+      if (username === 'hvignolo' && password === 'reposar0833') {
+        const adminUser: User = {
+          username: 'hvignolo',
+          password: 'reposar0833', // In a real app, don't store plain text password in user object
+          businessName: 'La Casa de los Colchones',
           registeredAt: new Date().toISOString(),
         };
 
-        users[username] = newUser;
-        await saveUsers(users);
-
-        setUser(newUser);
-        localStorage.setItem("currentUser", JSON.stringify(newUser));
+        setUser(adminUser);
+        localStorage.setItem("currentUser", JSON.stringify(adminUser));
         return true;
       } else {
-        // Login existing user
-        const existingUser = users[username];
-        if (existingUser && existingUser.password === password) {
-          setUser(existingUser);
-          localStorage.setItem("currentUser", JSON.stringify(existingUser));
-          return true;
-        } else {
-          return false;
-        }
+        return false;
       }
     } catch (error) {
       console.error('Login error:', error);

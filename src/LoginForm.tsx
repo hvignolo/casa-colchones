@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Bed, Lock, UserPlus } from 'lucide-react';
-import { LoginMode, User } from './types';
+import { Bed, Lock } from 'lucide-react';
+import { User } from './types';
 
 interface LoginFormProps {
   onLogin: (username: string, password: string, businessName: string) => Promise<boolean>;
@@ -8,11 +8,9 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
-  const [loginMode, setLoginMode] = useState<LoginMode>("login");
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    businessName: "",
   });
   const [loginError, setLoginError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -35,34 +33,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
       return;
     }
 
-    if (loginMode === "register" && !formData.businessName.trim()) {
-      setLoginError("El nombre del negocio es requerido");
-      setIsLoading(false);
-      return;
-    }
 
-    // Validaciones específicas para registro
-    if (loginMode === "register") {
-      if (formData.username.length < 3) {
-        setLoginError("El usuario debe tener al menos 3 caracteres");
-        setIsLoading(false);
-        return;
-      }
-
-      if (formData.password.length < 4) {
-        setLoginError("La contraseña debe tener al menos 4 caracteres");
-        setIsLoading(false);
-        return;
-      }
-
-      if (formData.businessName.length < 3) {
-        setLoginError(
-          "El nombre del negocio debe tener al menos 3 caracteres"
-        );
-        setIsLoading(false);
-        return;
-      }
-    }
 
     // Simular delay de autenticación
     setTimeout(async () => {
@@ -70,15 +41,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
         const success = await onLogin(
           formData.username,
           formData.password,
-          formData.businessName
+          "" // Business name no longer used for input
         );
 
         if (!success) {
-          setLoginError(
-            loginMode === "login"
-              ? "Usuario o contraseña incorrectos"
-              : "El usuario ya existe, intenta con otro nombre"
-          );
+          setLoginError("Usuario o contraseña incorrectos");
         }
       } catch (error) {
         console.error('Error during login:', error);
@@ -88,11 +55,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
     }, 800);
   };
 
-  const toggleLoginMode = () => {
-    setLoginMode(loginMode === "login" ? "register" : "login");
-    setLoginError("");
-    setFormData({ username: "", password: "", businessName: "" });
-  };
+
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData({ ...formData, [field]: value });
@@ -124,9 +87,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
             La Casa de los Colchones
           </h1>
           <p className="text-gray-600">
-            {loginMode === "login"
-              ? "Inicia sesión en tu cuenta"
-              : "Crea tu cuenta de negocio"}
+            Inicia sesión en tu cuenta
           </p>
         </div>
 
@@ -190,39 +151,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
               placeholder="Ingresa tu contraseña"
               required
               disabled={isLoading}
-              autoComplete={loginMode === "register" ? "new-password" : "current-password"}
+              autoComplete="current-password"
             />
           </div>
-
-          {/* Business Name Field (only for register) */}
-          {loginMode === "register" && (
-            <div>
-              <label htmlFor="login-business-name" className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre del Negocio
-              </label>
-              <input
-                type="text"
-                id="login-business-name"
-                name="businessName"
-                value={formData.businessName}
-                onChange={(e) => handleInputChange("businessName", e.target.value)}
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 ${loginError ? "border-red-300" : "border-gray-300"
-                  }`}
-                placeholder="Ej: Casa de Colchones Miranda"
-                required
-                disabled={isLoading}
-                autoComplete="organization"
-              />
-            </div>
-          )}
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
             className={`w-full py-3 px-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 ${isLoading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
               } text-white`}
           >
             {isLoading ? (
@@ -248,33 +187,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
                 </svg>
                 Procesando...
               </>
-            ) : loginMode === "login" ? (
+            ) : (
               <>
                 <Lock className="w-5 h-5" />
                 Iniciar Sesión
               </>
-            ) : (
-              <>
-                <UserPlus className="w-5 h-5" />
-                Crear Cuenta
-              </>
             )}
           </button>
         </form>
-
-        {/* Toggle Mode Button */}
-        <div className="mt-6 text-center">
-          <button
-            type="button"
-            onClick={toggleLoginMode}
-            className="text-blue-700 hover:text-blue-800 font-medium bg-white bg-opacity-80 px-4 py-2 rounded-lg transition-colors"
-            disabled={isLoading}
-          >
-            {loginMode === "login"
-              ? "¿No tienes cuenta? Regístrate aquí"
-              : "¿Ya tienes cuenta? Inicia sesión"}
-          </button>
-        </div>
       </div>
     </div>
   );
