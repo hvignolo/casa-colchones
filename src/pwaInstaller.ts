@@ -161,7 +161,7 @@ export class PWAInstaller {
               cacheKeys.map(key => caches.delete(key))
             );
           }
-          window.location.reload();
+          // window.location.reload(); // Removed to prevent reload loops
         }
       } catch (error) {
         console.error('Error unregistering SW:', error);
