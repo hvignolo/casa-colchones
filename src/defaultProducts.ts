@@ -26,7 +26,7 @@ export const defaultProducts: Product[] = [
     precioContado: 166521,
     precioTarjeta: 233129,
     detalles: "Colchón juvenil de baja densidad, ideal para uso ocasional.",
-    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049035182-249067d7438e?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -41,7 +41,7 @@ export const defaultProducts: Product[] = [
     precioContado: 218963,
     precioTarjeta: 306548,
     detalles: "Colchón de espuma de media densidad, ideal para descanso diario.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -54,7 +54,7 @@ export const defaultProducts: Product[] = [
     precioContado: 245951,
     precioTarjeta: 344331,
     detalles: "Colchón de espuma de media densidad, ideal para descanso diario.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -67,7 +67,7 @@ export const defaultProducts: Product[] = [
     precioContado: 374406,
     precioTarjeta: 524168,
     detalles: "Colchón de espuma de media densidad, ideal para descanso diario.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -82,7 +82,7 @@ export const defaultProducts: Product[] = [
     precioContado: 269756,
     precioTarjeta: 377658,
     detalles: "Colchón de espuma de alta densidad para mayor durabilidad y confort.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -95,7 +95,7 @@ export const defaultProducts: Product[] = [
     precioContado: 301340,
     precioTarjeta: 421876,
     detalles: "Colchón de espuma de alta densidad para mayor durabilidad y confort.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -108,7 +108,7 @@ export const defaultProducts: Product[] = [
     precioContado: 436041,
     precioTarjeta: 610457,
     detalles: "Colchón de espuma de alta densidad para mayor durabilidad y confort.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -121,7 +121,7 @@ export const defaultProducts: Product[] = [
     precioContado: 555187,
     precioTarjeta: 777262,
     detalles: "Colchón de espuma de alta densidad con pillow top.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -136,7 +136,7 @@ export const defaultProducts: Product[] = [
     precioContado: 353547,
     precioTarjeta: 494966,
     detalles: "Colchón premium de espuma de altísima densidad para máximo confort.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -149,7 +149,7 @@ export const defaultProducts: Product[] = [
     precioContado: 436041,
     precioTarjeta: 610457,
     detalles: "Colchón premium de espuma de altísima densidad para máximo confort.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -162,7 +162,7 @@ export const defaultProducts: Product[] = [
     precioContado: 671739,
     precioTarjeta: 940435,
     detalles: "Colchón premium de espuma de altísima densidad para máximo confort.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -175,7 +175,7 @@ export const defaultProducts: Product[] = [
     precioContado: 824943,
     precioTarjeta: 1154920,
     detalles: "Colchón premium de espuma de altísima densidad para máximo confort.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -188,7 +188,7 @@ export const defaultProducts: Product[] = [
     precioContado: 883867,
     precioTarjeta: 1237414,
     detalles: "Colchón premium de espuma de altísima densidad para máximo confort.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -201,7 +201,7 @@ export const defaultProducts: Product[] = [
     precioContado: 942792,
     precioTarjeta: 1319909,
     detalles: "Colchón premium de espuma de altísima densidad para máximo confort.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -216,7 +216,7 @@ export const defaultProducts: Product[] = [
     precioContado: 254554,
     precioTarjeta: 356376,
     detalles: "Colchón de máxima duración y firmeza con resortes de acero bicónicos.",
-    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049035182-249067d7438e?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -229,7 +229,7 @@ export const defaultProducts: Product[] = [
     precioContado: 308411,
     precioTarjeta: 431775,
     detalles: "Colchón de máxima duración y firmeza con resortes de acero bicónicos.",
-    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049035182-249067d7438e?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -242,7 +242,7 @@ export const defaultProducts: Product[] = [
     precioContado: 400922,
     precioTarjeta: 561290,
     detalles: "Colchón de máxima duración y firmeza con resortes de acero bicónicos.",
-    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049035182-249067d7438e?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -255,7 +255,7 @@ export const defaultProducts: Product[] = [
     precioContado: 593841,
     precioTarjeta: 831377,
     detalles: "Colchón con tecnología de resortes clásicos y pillow top para mayor comodidad.",
-    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049035182-249067d7438e?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -268,7 +268,7 @@ export const defaultProducts: Product[] = [
     precioContado: 288135,
     precioTarjeta: 403389,
     detalles: "Colchón con tecnología de resortes clásicos y pillow top para mayor comodidad.",
-    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049035182-249067d7438e?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -281,7 +281,7 @@ export const defaultProducts: Product[] = [
     precioContado: 355932,
     precioTarjeta: 498305,
     detalles: "Colchón con tecnología de resortes clásicos y pillow top para mayor comodidad.",
-    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049035182-249067d7438e?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -296,7 +296,7 @@ export const defaultProducts: Product[] = [
     precioContado: 542812,
     precioTarjeta: 759937,
     detalles: "Colchón con resortes individuales ensacados para máximo confort y durabilidad.",
-    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049552057-403cdb8f0658?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -309,7 +309,7 @@ export const defaultProducts: Product[] = [
     precioContado: 723475,
     precioTarjeta: 1012865,
     detalles: "Colchón con resortes individuales ensacados para máximo confort y durabilidad.",
-    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049552057-403cdb8f0658?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -322,7 +322,7 @@ export const defaultProducts: Product[] = [
     precioContado: 912387,
     precioTarjeta: 1277342,
     detalles: "Colchón con resortes individuales ensacados para máximo confort y durabilidad.",
-    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049552057-403cdb8f0658?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -335,7 +335,7 @@ export const defaultProducts: Product[] = [
     precioContado: 1014680,
     precioTarjeta: 1420552,
     detalles: "Colchón con resortes individuales ensacados para máximo confort y durabilidad.",
-    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049552057-403cdb8f0658?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -348,7 +348,7 @@ export const defaultProducts: Product[] = [
     precioContado: 1195578,
     precioTarjeta: 1673809,
     detalles: "Colchón con resortes individuales ensacados para máximo confort y durabilidad.",
-    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1631049552057-403cdb8f0658?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -363,7 +363,7 @@ export const defaultProducts: Product[] = [
     precioContado: 96395,
     precioTarjeta: 134953,
     detalles: "Base para sommier de alta calidad y durabilidad.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -376,7 +376,7 @@ export const defaultProducts: Product[] = [
     precioContado: 110501,
     precioTarjeta: 154701,
     detalles: "Base para sommier de alta calidad y durabilidad.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -389,7 +389,7 @@ export const defaultProducts: Product[] = [
     precioContado: 141065,
     precioTarjeta: 197491,
     detalles: "Base para sommier de alta calidad y durabilidad.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -402,7 +402,7 @@ export const defaultProducts: Product[] = [
     precioContado: 108033,
     precioTarjeta: 151246,
     detalles: "Base para sommier clásica con mayor altura.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -415,7 +415,7 @@ export const defaultProducts: Product[] = [
     precioContado: 112852,
     precioTarjeta: 157993,
     detalles: "Base para sommier clásica con mayor altura.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -428,7 +428,7 @@ export const defaultProducts: Product[] = [
     precioContado: 152821,
     precioTarjeta: 213949,
     detalles: "Base para sommier clásica con mayor altura.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -441,7 +441,7 @@ export const defaultProducts: Product[] = [
     precioContado: 124608,
     precioTarjeta: 174451,
     detalles: "Box sommier premium línea Berlin.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -454,7 +454,7 @@ export const defaultProducts: Product[] = [
     precioContado: 124608,
     precioTarjeta: 174451,
     detalles: "Box sommier premium línea Berlin.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -467,7 +467,7 @@ export const defaultProducts: Product[] = [
     precioContado: 129310,
     precioTarjeta: 181034,
     detalles: "Box sommier premium línea Berlin.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -482,7 +482,7 @@ export const defaultProducts: Product[] = [
     precioContado: 18974,
     precioTarjeta: 26564,
     detalles: "Almohada de calidad premium para descanso óptimo.",
-    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -495,7 +495,7 @@ export const defaultProducts: Product[] = [
     precioContado: 29344,
     precioTarjeta: 41082,
     detalles: "Almohada de calidad premium para descanso óptimo.",
-    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -508,7 +508,7 @@ export const defaultProducts: Product[] = [
     precioContado: 15792,
     precioTarjeta: 22109,
     detalles: "Almohada de calidad premium para descanso óptimo.",
-    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -521,7 +521,7 @@ export const defaultProducts: Product[] = [
     precioContado: 14378,
     precioTarjeta: 20129,
     detalles: "Almohada de calidad premium para descanso óptimo.",
-    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -534,7 +534,7 @@ export const defaultProducts: Product[] = [
     precioContado: 18267,
     precioTarjeta: 25574,
     detalles: "Almohada de calidad premium para descanso óptimo.",
-    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -549,7 +549,7 @@ export const defaultProducts: Product[] = [
     precioContado: 34883,
     precioTarjeta: 48836,
     detalles: "Colchón especial para cunas de bebé, hipoalergénico.",
-    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -562,7 +562,7 @@ export const defaultProducts: Product[] = [
     precioContado: 36415,
     precioTarjeta: 50981,
     detalles: "Colchón especial para cunas de bebé, hipoalergénico.",
-    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -575,7 +575,7 @@ export const defaultProducts: Product[] = [
     precioContado: 63403,
     precioTarjeta: 88764,
     detalles: "Colchón especial para cunas de bebé, hipoalergénico.",
-    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -590,7 +590,7 @@ export const defaultProducts: Product[] = [
     precioContado: 91304,
     precioTarjeta: 127826,
     detalles: "Respaldo acolchado en eco cuero de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -603,7 +603,7 @@ export const defaultProducts: Product[] = [
     precioContado: 100435,
     precioTarjeta: 140609,
     detalles: "Respaldo acolchado en eco cuero de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -616,7 +616,7 @@ export const defaultProducts: Product[] = [
     precioContado: 63913,
     precioTarjeta: 89478,
     detalles: "Respaldo acolchado en eco cuero de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -629,7 +629,7 @@ export const defaultProducts: Product[] = [
     precioContado: 70761,
     precioTarjeta: 99065,
     detalles: "Respaldo acolchado en eco cuero de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -642,7 +642,7 @@ export const defaultProducts: Product[] = [
     precioContado: 107283,
     precioTarjeta: 150196,
     detalles: "Respaldo acolchado en eco cuero de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -655,7 +655,7 @@ export const defaultProducts: Product[] = [
     precioContado: 120978,
     precioTarjeta: 169369,
     detalles: "Respaldo acolchado en eco cuero de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -670,7 +670,7 @@ export const defaultProducts: Product[] = [
     precioContado: 129974,
     precioTarjeta: 181964,
     detalles: "Respaldo premium tapizado en pana de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -683,7 +683,7 @@ export const defaultProducts: Product[] = [
     precioContado: 148100,
     precioTarjeta: 207340,
     detalles: "Respaldo premium tapizado en pana de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -696,7 +696,7 @@ export const defaultProducts: Product[] = [
     precioContado: 166229,
     precioTarjeta: 232720,
     detalles: "Respaldo premium tapizado en pana de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -709,7 +709,7 @@ export const defaultProducts: Product[] = [
     precioContado: 184355,
     precioTarjeta: 258097,
     detalles: "Respaldo premium tapizado en pana de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -724,7 +724,7 @@ export const defaultProducts: Product[] = [
     precioContado: 99494,
     precioTarjeta: 139292,
     detalles: "Respaldo premium tapizado en pana de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -737,7 +737,7 @@ export const defaultProducts: Product[] = [
     precioContado: 126484,
     precioTarjeta: 177078,
     detalles: "Respaldo premium tapizado en pana de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -750,7 +750,7 @@ export const defaultProducts: Product[] = [
     precioContado: 189726,
     precioTarjeta: 265616,
     detalles: "Respaldo premium tapizado en pana de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -763,7 +763,7 @@ export const defaultProducts: Product[] = [
     precioContado: 225844,
     precioTarjeta: 316182,
     detalles: "Respaldo premium tapizado en pana de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -776,7 +776,7 @@ export const defaultProducts: Product[] = [
     precioContado: 243970,
     precioTarjeta: 341558,
     detalles: "Respaldo premium tapizado en pana de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -789,7 +789,7 @@ export const defaultProducts: Product[] = [
     precioContado: 262098,
     precioTarjeta: 366937,
     detalles: "Respaldo premium tapizado en pana de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -804,7 +804,7 @@ export const defaultProducts: Product[] = [
     precioContado: 208658,
     precioTarjeta: 292121,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -817,7 +817,7 @@ export const defaultProducts: Product[] = [
     precioContado: 109431,
     precioTarjeta: 153203,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -830,7 +830,7 @@ export const defaultProducts: Product[] = [
     precioContado: 139104,
     precioTarjeta: 194746,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -843,7 +843,7 @@ export const defaultProducts: Product[] = [
     precioContado: 248403,
     precioTarjeta: 347764,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -856,7 +856,7 @@ export const defaultProducts: Product[] = [
     precioContado: 268407,
     precioTarjeta: 375770,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -869,7 +869,7 @@ export const defaultProducts: Product[] = [
     precioContado: 288280,
     precioTarjeta: 403592,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -884,7 +884,7 @@ export const defaultProducts: Product[] = [
     precioContado: 99494,
     precioTarjeta: 139292,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -897,7 +897,7 @@ export const defaultProducts: Product[] = [
     precioContado: 126484,
     precioTarjeta: 177078,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -910,7 +910,7 @@ export const defaultProducts: Product[] = [
     precioContado: 189726,
     precioTarjeta: 265616,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -923,7 +923,7 @@ export const defaultProducts: Product[] = [
     precioContado: 225844,
     precioTarjeta: 316182,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -936,7 +936,7 @@ export const defaultProducts: Product[] = [
     precioContado: 243970,
     precioTarjeta: 341558,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -949,7 +949,7 @@ export const defaultProducts: Product[] = [
     precioContado: 262098,
     precioTarjeta: 366937,
     detalles: "Respaldo acolchado de alta calidad.",
-    image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -965,7 +965,7 @@ export const defaultProducts: Product[] = [
     precioContado: 315358, // TM NOCHE 080 (218963) + BOX EXTRA 080 (96395)
     precioTarjeta: 441501,
     detalles: "Sommier completo con colchón TM NOCHE 080 y 1 box Extra 080 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -978,7 +978,7 @@ export const defaultProducts: Product[] = [
     precioContado: 366151, // AREZZO 080 (269756) + BOX EXTRA 080 (96395)
     precioTarjeta: 512611,
     detalles: "Sommier completo con colchón AREZZO 080 y 1 box Extra 080 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -991,7 +991,7 @@ export const defaultProducts: Product[] = [
     precioContado: 449942, // THE BEST EURO 080 (353547) + BOX EXTRA 080 (96395)
     precioTarjeta: 629919,
     detalles: "Sommier completo con colchón THE BEST EURO 080 y 1 box Extra 080 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1004,7 +1004,7 @@ export const defaultProducts: Product[] = [
     precioContado: 350949, // EXTRA 080 (254554) + BOX EXTRA 080 (96395)
     precioTarjeta: 491329,
     detalles: "Sommier completo con colchón EXTRA 080 y 1 box Extra 080 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1017,7 +1017,7 @@ export const defaultProducts: Product[] = [
     precioContado: 384530, // T CLAS RES c/p 080 (288135) + BOX EXTRA 080 (96395)
     precioTarjeta: 538342,
     detalles: "Sommier completo con colchón T CLAS RES c/p 080 y 1 box Extra 080 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -1032,7 +1032,7 @@ export const defaultProducts: Product[] = [
     precioContado: 356452, // TM NOCHE 100 (245951) + BOX EXTRA 100 (110501)
     precioTarjeta: 499033,
     detalles: "Sommier completo con colchón TM NOCHE 100 y 1 box Extra 100 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1045,7 +1045,7 @@ export const defaultProducts: Product[] = [
     precioContado: 411841, // AREZZO 100 (301340) + BOX EXTRA 100 (110501)
     precioTarjeta: 576577,
     detalles: "Sommier completo con colchón AREZZO 100 y 1 box Extra 100 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1058,7 +1058,7 @@ export const defaultProducts: Product[] = [
     precioContado: 546542, // THE BEST EURO 100 (436041) + BOX EXTRA 100 (110501)
     precioTarjeta: 765159,
     detalles: "Sommier completo con colchón THE BEST EURO 100 y 1 box Extra 100 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1071,7 +1071,7 @@ export const defaultProducts: Product[] = [
     precioContado: 418912, // EXTRA 100 (308411) + BOX EXTRA 100 (110501)
     precioTarjeta: 586477,
     detalles: "Sommier completo con colchón EXTRA 100 y 1 box Extra 100 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1084,7 +1084,7 @@ export const defaultProducts: Product[] = [
     precioContado: 466433, // T CLAS RES c/p 100 (355932) + BOX EXTRA 100 (110501)
     precioTarjeta: 653006,
     detalles: "Sommier completo con colchón T CLAS RES c/p 100 y 1 box Extra 100 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1097,7 +1097,7 @@ export const defaultProducts: Product[] = [
     precioContado: 653313, // BERLIN EURO 100 (542812) + BOX EXTRA 100 (110501)
     precioTarjeta: 914638,
     detalles: "Sommier completo con colchón BERLIN EURO 100 y 1 box Extra 100 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -1112,7 +1112,7 @@ export const defaultProducts: Product[] = [
     precioContado: 515471, // TM NOCHE 140 (374406) + BOX EXTRA 140 (141065)
     precioTarjeta: 721659,
     detalles: "Sommier completo con colchón TM NOCHE 140 y 1 box Extra 140 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1125,7 +1125,7 @@ export const defaultProducts: Product[] = [
     precioContado: 577106, // AREZZO 140 (436041) + BOX EXTRA 140 (141065)
     precioTarjeta: 807948,
     detalles: "Sommier completo con colchón AREZZO 140 y 1 box Extra 140 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1138,7 +1138,7 @@ export const defaultProducts: Product[] = [
     precioContado: 696252, // T CLAS ESP C/P 140 (555187) + BOX EXTRA 140 (141065)
     precioTarjeta: 974753,
     detalles: "Sommier completo con colchón T CLAS ESP C/P 140 y 1 box Extra 140 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1151,7 +1151,7 @@ export const defaultProducts: Product[] = [
     precioContado: 812804, // THE BEST EURO 140 (671739) + BOX EXTRA 140 (141065)
     precioTarjeta: 1137926,
     detalles: "Sommier completo con colchón THE BEST EURO 140 y 1 box Extra 140 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1164,7 +1164,7 @@ export const defaultProducts: Product[] = [
     precioContado: 541987, // EXTRA 140 (400922) + BOX EXTRA 140 (141065)
     precioTarjeta: 758781,
     detalles: "Sommier completo con colchón EXTRA 140 y 1 box Extra 140 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1177,7 +1177,7 @@ export const defaultProducts: Product[] = [
     precioContado: 734906, // T CLAS RES c/p 140 (593841) + BOX EXTRA 140 (141065)
     precioTarjeta: 1028868,
     detalles: "Sommier completo con colchón T CLAS RES c/p 140 y 1 box Extra 140 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1190,7 +1190,7 @@ export const defaultProducts: Product[] = [
     precioContado: 864540, // BERLIN EURO 140 (723475) + BOX EXTRA 140 (141065)
     precioTarjeta: 1210356,
     detalles: "Sommier completo con colchón BERLIN EURO 140 y 1 box Extra 140 incluido.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -1205,7 +1205,7 @@ export const defaultProducts: Product[] = [
     precioContado: 1041009, // THE BEST EURO 160 (824943) + 2 BOX T CLAS (108033 * 2)
     precioTarjeta: 1457413,
     detalles: "Sommier completo con colchón THE BEST EURO 160 y 2 boxes T Clas 80 incluidos.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1218,7 +1218,7 @@ export const defaultProducts: Product[] = [
     precioContado: 1128453, // BERLIN EURO 160 (912387) + 2 BOX T CLAS (108033 * 2)
     precioTarjeta: 1579834,
     detalles: "Sommier completo con colchón BERLIN EURO 160 y 2 boxes T Clas 80 incluidos.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -1233,7 +1233,7 @@ export const defaultProducts: Product[] = [
     precioContado: 1133083, // THE BEST EURO 180 (883867) + 2 BOX BERLIN 90 (124608 * 2)
     precioTarjeta: 1586316,
     detalles: "Sommier completo con colchón THE BEST EURO 180 y 2 boxes Berlin 90 incluidos.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1246,7 +1246,7 @@ export const defaultProducts: Product[] = [
     precioContado: 1263896, // BERLIN EURO 180 (1014680) + 2 BOX BERLIN 90 (124608 * 2)
     precioTarjeta: 1769454,
     detalles: "Sommier completo con colchón BERLIN EURO 180 y 2 boxes Berlin 90 incluidos.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
 
@@ -1261,7 +1261,7 @@ export const defaultProducts: Product[] = [
     precioContado: 1201412, // THE BEST EURO 200 (942792) + 2 BOX BERLIN 100 (129310 * 2)
     precioTarjeta: 1681977,
     detalles: "Sommier completo con colchón THE BEST EURO 200 y 2 boxes Berlin 100 incluidos.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   },
   {
@@ -1274,7 +1274,7 @@ export const defaultProducts: Product[] = [
     precioContado: 1454198, // BERLIN EURO 200 (1195578) + 2 BOX BERLIN 100 (129310 * 2)
     precioTarjeta: 2035877,
     detalles: "Sommier completo con colchón BERLIN EURO 200 y 2 boxes Berlin 100 incluidos.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443641fde1?w=500&h=400&fit=crop",
     marca: "Reposar"
   }
 ];
