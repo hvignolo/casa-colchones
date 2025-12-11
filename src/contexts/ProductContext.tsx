@@ -58,13 +58,22 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
 
     const updateProductsBatch = async (newProducts: Product[]) => {
+        const BATCH_SIZE = 500;
+        const chunks = [];
+
+        for (let i = 0; i < newProducts.length; i += BATCH_SIZE) {
+            chunks.push(newProducts.slice(i, i + BATCH_SIZE));
+        }
+
         try {
-            const batch = writeBatch(db);
-            newProducts.forEach((product) => {
-                const productRef = doc(db, "products", product.codigo);
-                batch.set(productRef, product);
-            });
-            await batch.commit();
+            await Promise.all(chunks.map(async (chunk) => {
+                const batch = writeBatch(db);
+                chunk.forEach((product) => {
+                    const productRef = doc(db, "products", product.codigo);
+                    batch.set(productRef, product);
+                });
+                await batch.commit();
+            }));
         } catch (error) {
             console.error("Error batch updating products:", error);
             throw error;
