@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Settings,
@@ -46,6 +47,7 @@ interface CalculatorPreloadData {
 // Removed unused Armchair component
 
 const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { user: currentUser, logout } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -234,6 +236,7 @@ const AdminDashboard: React.FC = () => {
       setActiveFilter("TODOS");
       setShowSettings(false);
       setSelectedProduct(null);
+      navigate("/admin/login");
       showToastMessage("Sesión cerrada exitosamente");
     }
   };
@@ -655,8 +658,8 @@ const AdminDashboard: React.FC = () => {
                 key={chip.id}
                 onClick={() => setActiveFilter(chip.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all ${isActive
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
               >
                 <IconComponent className="w-4 h-4" />
