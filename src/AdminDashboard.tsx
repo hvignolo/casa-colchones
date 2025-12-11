@@ -258,11 +258,40 @@ const AdminDashboard: React.FC = () => {
       });
 
       const codeRaw = cols[0]?.trim();
-      const priceStr = cols[3]?.trim();
+      let priceStr = cols[3]?.trim();
 
-      if (codeRaw && !isNaN(Number(codeRaw)) && priceStr && !isNaN(parseFloat(priceStr))) {
-        const normalizedCode = parseInt(codeRaw, 10).toString();
-        priceMap[normalizedCode] = parseFloat(priceStr);
+      if (codeRaw && priceStr) {
+        // Normalizar código
+        let normalizedCode = codeRaw;
+        // Intentar parsear como numero para quitar ceros a la izquierda si es puramente numérico
+        // pero mantener como string.
+        if (!isNaN(Number(codeRaw))) {
+          normalizedCode = parseInt(codeRaw, 10).toString();
+        }
+
+        // Limpiar y parsear precio
+        // 1. Remover símbolo de moneda y espacios
+        let cleanPrice = priceStr.replace(/[$\s]/g, '');
+
+        // 2. Manejar formato argentino/europeo (1.234,56) vs internacional (1,234.56)
+        // Heurística: Si hay comas y puntos
+        if (cleanPrice.includes(',') && cleanPrice.includes('.')) {
+          // Asumimos formato AR: 1.000,00 -> eliminar puntos, reemplazar coma por punto
+          cleanPrice = cleanPrice.replace(/\./g, '').replace(',', '.');
+        } else if (cleanPrice.includes(',')) {
+          // Solo comas: 100,50 -> 100.50
+          cleanPrice = cleanPrice.replace(',', '.');
+        }
+        // Si solo hay puntos (1.500), es ambiguo, pero parseFloat lo maneja como 1.5 si es decimal
+        // o si es separador de miles se rompe. 
+        // Asumiendo que si viene de Excel/CSV AR, los miles usan punto.
+        // Pero si es conversión interna (XLS->CSV), viene como 1500.00 (formato standard JS).
+
+        const price = parseFloat(cleanPrice);
+
+        if (!isNaN(price)) {
+          priceMap[normalizedCode] = price;
+        }
       }
     });
 
