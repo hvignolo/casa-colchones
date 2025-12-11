@@ -11,12 +11,12 @@ import {
   Trash2,
   Save,
 } from 'lucide-react';
-import { 
-  Product, 
-  StoreData, 
-  User, 
+import {
+  Product,
+  StoreData,
+  User,
   SettingsView,
-  ProductFormProps 
+  ProductFormProps
 } from './types';
 
 interface SettingsModalProps {
@@ -34,6 +34,7 @@ interface SettingsModalProps {
   onResetData: () => void;
   onImportPriceList: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onImportXmlPriceList: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onImportXlsPriceList: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onShowToast: (message: string) => void;
   formatPrice: (value: number) => string;
 }
@@ -53,6 +54,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onResetData,
   onImportPriceList,
   onImportXmlPriceList,
+  onImportXlsPriceList,
   onShowToast,
   formatPrice
 }) => {
@@ -467,6 +469,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     import: generateId('import-file'),
     importPrices: generateId('import-prices-file'),
     importXmlPrices: generateId('import-xml-prices-file'),
+    importXlsPrices: generateId('import-xls-prices-file'),
   };
 
   // Función para renderizar el contenido según la vista
@@ -732,6 +735,30 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   className="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-700 transition-colors cursor-pointer inline-block"
                 >
                   📄 Importar XML
+                </label>
+              </div>
+
+              <div className="bg-green-50 p-4 rounded-lg">
+                <h4 className="font-medium text-green-900 mb-2">
+                  Importar Lista de Precios (Excel)
+                </h4>
+                <p className="text-sm text-green-700 mb-3">
+                  Selecciona un archivo Excel (.xls, .xlsx) con las columnas:
+                  Código, Precio (obligatorias), Nombre, Medida, Estado
+                  (opcionales).
+                </p>
+                <input
+                  type="file"
+                  accept=".xls,.xlsx"
+                  onChange={onImportXlsPriceList}
+                  className="hidden"
+                  id={fileInputIds.importXlsPrices}
+                />
+                <label
+                  htmlFor={fileInputIds.importXlsPrices}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors cursor-pointer inline-block"
+                >
+                  📊 Importar Excel
                 </label>
               </div>
             </div>

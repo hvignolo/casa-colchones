@@ -33,6 +33,7 @@ import { productToCartolaData, getCartolaStyleByProductType } from "./cartolaInt
 import { ProductImage } from "./ProductImage";
 import { useAuth } from './contexts/AuthContext';
 import { convertXmlToCsv } from './xmlToCsvConverter';
+import { convertXlsToCsv } from './xlsToCsvConverter';
 
 // Tipos para la integración
 interface CalculatorPreloadData {
@@ -353,6 +354,39 @@ const AdminDashboard: React.FC = () => {
       }
     };
     reader.readAsText(file);
+  };
+
+  // Importar lista de precios desde un archivo Excel
+  const handleImportXlsPriceList = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const arrayBuffer = e.target?.result as ArrayBuffer;
+
+        // Convertir Excel a CSV
+        const result = convertXlsToCsv(arrayBuffer);
+
+        if (!result.success) {
+          showToastMessage(result.error || ERROR_MESSAGES.INVALID_FILE);
+          return;
+        }
+
+        // Procesar el CSV generado usando la lógica existente
+        const csvContent = result.csvContent!;
+        await processCSVContent(csvContent);
+
+        showToastMessage(
+          `¡Precios actualizados! (${result.productsCount} productos)`
+        );
+      } catch (error) {
+        console.error(error);
+        showToastMessage("Error al procesar el archivo Excel");
+      }
+    };
+    reader.readAsArrayBuffer(file);
   };
 
   const filterChips = FILTER_CHIPS;
@@ -966,6 +1000,7 @@ const AdminDashboard: React.FC = () => {
         onResetData={resetData}
         onImportPriceList={importPriceList}
         onImportXmlPriceList={handleImportXmlPriceList}
+        onImportXlsPriceList={handleImportXlsPriceList}
         onShowToast={showToastMessage}
         formatPrice={formatPrice}
       />
