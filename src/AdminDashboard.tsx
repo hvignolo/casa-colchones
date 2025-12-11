@@ -47,9 +47,23 @@ interface CalculatorPreloadData {
 
 // Removed unused Armchair component
 
+// ... imports
+import { useProducts } from './contexts/ProductContext'; // Add this import
+
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user: currentUser, logout } = useAuth();
+
+  // Use global product state from Firestore
+  const { products, loading: productsLoading, updateProductsBatch, deleteProduct } = useProducts();
+
+  // ...
+
+  // ...
+
+
+  // const [products, setProducts] = useState<Product[]>([]); // Remove local state
+
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("TODOS");
@@ -64,12 +78,10 @@ const AdminDashboard: React.FC = () => {
   const [calculatorPreloadData, setCalculatorPreloadData] = useState<CalculatorPreloadData | undefined>(undefined);
   const [cartolaPreloadData, setCartolaPreloadData] = useState<any>(undefined);
 
-  // Hook para funcionalidad offline
+  // Hook para funcionalidad offline (mantener por ahora para storeData)
   const {
     isOnline,
     isLoading: offlineLoading,
-    saveProductsOffline,
-    loadProductsOffline,
     saveStoreDataOffline,
     loadStoreDataOffline,
     addOfflineAction,
@@ -78,9 +90,6 @@ const AdminDashboard: React.FC = () => {
 
   // Datos de la tienda con persistencia offline
   const [storeData, setStoreData] = useState<StoreData>(DEFAULT_STORE_DATA);
-
-  // Datos de productos con persistencia offline
-  const [products, setProducts] = useState<Product[]>([]);
 
   // Registrar Service Worker - Versión para producción y GitHub Pages
   useEffect(() => {
@@ -129,15 +138,7 @@ const AdminDashboard: React.FC = () => {
           await saveStoreDataOffline(defaultStoreWithName, currentUser.username);
         }
 
-        // Cargar productos
-        const offlineProducts = await loadProductsOffline(currentUser.username);
-        if (offlineProducts.length > 0) {
-          setProducts(offlineProducts);
-        } else {
-          // Si no hay productos offline, usar los productos por defecto
-          setProducts(defaultProducts);
-          await saveProductsOffline(defaultProducts, currentUser.username);
-        }
+        // Product loading is now handled by ProductContext
       } catch (error) {
         console.error('Error loading user data:', error);
         // Fallback a localStorage
@@ -146,16 +147,13 @@ const AdminDashboard: React.FC = () => {
           name: currentUser.businessName,
         });
         setStoreData(fallbackStoreData);
-
-        const fallbackProducts = loadFromLocalStorage("products", defaultProducts);
-        setProducts(fallbackProducts);
       }
     };
 
     loadUserData();
-  }, [currentUser, loadStoreDataOffline, saveStoreDataOffline, loadProductsOffline, saveProductsOffline]);
+  }, [currentUser, loadStoreDataOffline, saveStoreDataOffline]); // Removed product dependencies
 
-  // Guardar datos automáticamente offline
+  // Guardar datos automáticamente offline (Store only)
   useEffect(() => {
     const saveData = async () => {
       if (currentUser && storeData.name && !offlineLoading) {
@@ -172,21 +170,7 @@ const AdminDashboard: React.FC = () => {
     saveData();
   }, [storeData, currentUser, saveStoreDataOffline, offlineLoading]);
 
-  useEffect(() => {
-    const saveData = async () => {
-      if (currentUser && products.length > 0 && !offlineLoading) {
-        try {
-          await saveProductsOffline(products, currentUser.username);
-          // También guardar en localStorage como fallback
-          saveToLocalStorage("products", products);
-        } catch (error) {
-          console.error('Error saving products offline:', error);
-        }
-      }
-    };
-
-    saveData();
-  }, [products, currentUser, saveProductsOffline, offlineLoading]);
+  // Removed product saving effect as it's handled by Firestore
 
   // Limpiar datos antiguos periódicamente
   useEffect(() => {
@@ -257,7 +241,21 @@ const AdminDashboard: React.FC = () => {
     const priceMap: Record<string, number> = {};
 
     lines.forEach((line) => {
-      const cols = line.split(",");
+      // Usar regex para separar por comas pero ignorar las que están dentro de comillas
+      const matches = line.match(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/g);
+
+      if (!matches) return;
+
+      const cols = matches.map(col => {
+        // Eliminar la coma inicial si existe (dado el regex) y las comillas envolventes
+        let val = col.startsWith(',') ? col.slice(1) : col;
+        val = val.trim();
+        if (val.startsWith('"') && val.endsWith('"')) {
+          val = val.slice(1, -1).replace(/""/g, '"');
+        }
+        return val;
+      });
+
       const codeRaw = cols[0]?.trim();
       const priceStr = cols[3]?.trim();
 
@@ -267,6 +265,7 @@ const AdminDashboard: React.FC = () => {
       }
     });
 
+    // Calculate new products locally first
     const updatedProducts = products.map((p) => {
       if (p.tipo === "SOMMIERS") return p;
       const newPrice = priceMap[p.codigo];
@@ -283,8 +282,21 @@ const AdminDashboard: React.FC = () => {
       let sum = 0;
       combo.forEach((code) => {
         const item = products.find((it) => it.codigo === code);
-        if (item) {
-          sum += item.precioContado;
+        // Note: We need to use the Updated price of components here.
+        // Since map runs sequentially, if 'products' is old, we need to look check 
+        // if the component was updated in the previous map step.
+        // Optimization: Create a map of updated items first.
+
+        // However, for this implementation, let's fix the logic to be robust:
+        // Check priceMap for the component price first
+        const componentPriceRaw = priceMap[code];
+        if (componentPriceRaw !== undefined) {
+          const compContado = Math.round((componentPriceRaw * 2 + Number.EPSILON) * 100) / 100;
+          sum += compContado;
+        } else {
+          // Fallback to existing product price if not in CSV
+          const existing = products.find(it => it.codigo === code);
+          if (existing) sum += existing.precioContado;
         }
       });
       sum = Math.round((sum + Number.EPSILON) * 100) / 100;
@@ -292,9 +304,16 @@ const AdminDashboard: React.FC = () => {
       return { ...p, precioContado: sum, precioTarjeta: newTarjeta };
     });
 
-    setProducts(updatedProducts);
+    // BATCH UPDATE TO FIRESTORE
+    try {
+      await updateProductsBatch(updatedProducts);
+      showToastMessage(SUCCESS_MESSAGES.PRICES_UPDATED);
+    } catch (error) {
+      console.error("Error updating Firestore:", error);
+      showToastMessage("Error saving to database");
+    }
 
-    // Registrar acción offline si no hay conexión
+    // Registrar acción offline si no hay conexión (keep independent of Firestore for now)
     if (!isOnline && currentUser) {
       await addOfflineAction({
         type: 'IMPORT_PRICES',
@@ -420,25 +439,33 @@ const AdminDashboard: React.FC = () => {
 
   const handleDeleteProduct = async (id: number) => {
     if (window.confirm(CONFIRMATION_MESSAGES.DELETE_PRODUCT)) {
-      const updatedProducts = products.filter((p) => p.id !== id);
-      setProducts(updatedProducts);
-
-      // Registrar acción offline si no hay conexión
-      if (!isOnline && currentUser) {
-        await addOfflineAction({
-          type: 'DELETE_PRODUCT',
-          productId: id
-        }, currentUser.username);
+      const productToDelete = products.find(p => p.id === id);
+      if (productToDelete) {
+        try {
+          await deleteProduct(productToDelete.codigo);
+          // Note: Offline logging kept for history, but action won't replay to Firestore without new offline handler logic
+          if (!isOnline && currentUser) {
+            await addOfflineAction({ type: 'DELETE_PRODUCT', productId: id }, currentUser.username);
+          }
+        } catch (e) {
+          console.error("Failed to delete", e);
+          showToastMessage("Error deleting product");
+        }
       }
     }
   };
 
   const handleSaveProduct = async (productData: Omit<Product, 'id'>) => {
+    // Generate new ID based on max (unsafe in distributed, but ok for migration)
+    const newId = Math.max(...products.map((p) => p.id), 0) + 1;
     const newProduct = {
       ...productData,
-      id: Math.max(...products.map((p) => p.id), 0) + 1,
+      id: newId,
     };
-    setProducts([...products, newProduct]);
+
+    // Save to Firestore
+    // Note: We use 'codigo' as doc ID in updateProduct
+    await updateProductsBatch([newProduct]);
 
     // Registrar acción offline si no hay conexión
     if (!isOnline && currentUser) {
@@ -527,7 +554,8 @@ const AdminDashboard: React.FC = () => {
         const data = JSON.parse(e.target?.result as string);
 
         if (data.products) {
-          setProducts(data.products);
+          // Upload imported products to Firestore
+          await updateProductsBatch(data.products);
         }
         if (data.storeData) {
           setStoreData(data.storeData);
@@ -557,7 +585,8 @@ const AdminDashboard: React.FC = () => {
         name: currentUser?.businessName || DEFAULT_STORE_DATA.name,
       };
 
-      setProducts(defaultProducts);
+      // Reset products to default in Firestore
+      await updateProductsBatch(defaultProducts);
       setStoreData(defaultStoreWithName);
 
       // Registrar acción offline si no hay conexión

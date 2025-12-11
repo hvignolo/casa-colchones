@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Filter, SlidersHorizontal, Grid3X3, List } from 'lucide-react';
-import { defaultProducts } from '../defaultProducts';
+import { useProducts } from '../contexts/ProductContext';
 import { FILTER_CHIPS } from '../components/IconComponents';
 import ProductCard from '../components/public/ProductCard';
 
 const ProductsPage: React.FC = () => {
+  const { products } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('TODOS');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000000]);
@@ -14,18 +15,18 @@ const ProductsPage: React.FC = () => {
 
   // Filter and search products
   const filteredProducts = useMemo(() => {
-    let filtered = defaultProducts;
+    let filtered = products;
 
     // Apply category filter
     if (activeFilter !== "TODOS") {
       if (activeFilter === "RESORTES") {
-        filtered = filtered.filter(p => 
-          (p.tipo === 'COLCHONES' || p.tipo === 'SOMMIERS') && 
+        filtered = filtered.filter(p =>
+          (p.tipo === 'COLCHONES' || p.tipo === 'SOMMIERS') &&
           p.subtipo.toLowerCase().includes("resortes")
         );
       } else if (activeFilter === "ESPUMA") {
-        filtered = filtered.filter(p => 
-          (p.tipo === 'COLCHONES' || p.tipo === 'SOMMIERS') && 
+        filtered = filtered.filter(p =>
+          (p.tipo === 'COLCHONES' || p.tipo === 'SOMMIERS') &&
           p.subtipo.toLowerCase().includes("espuma")
         );
       } else {
@@ -47,8 +48,8 @@ const ProductsPage: React.FC = () => {
 
     // Apply price range filter
     filtered = filtered.filter(
-      (product) => 
-        product.precioContado >= priceRange[0] && 
+      (product) =>
+        product.precioContado >= priceRange[0] &&
         product.precioContado <= priceRange[1]
     );
 
@@ -68,9 +69,9 @@ const ProductsPage: React.FC = () => {
     });
 
     return filtered;
-  }, [activeFilter, searchQuery, priceRange, sortBy]);
+  }, [activeFilter, searchQuery, priceRange, sortBy, products]);
 
-  const maxPrice = Math.max(...defaultProducts.map(p => p.precioContado));
+  const maxPrice = products.length > 0 ? Math.max(...products.map(p => p.precioContado)) : 2000000;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -132,11 +133,10 @@ const ProductsPage: React.FC = () => {
                       <button
                         key={chip.id}
                         onClick={() => setActiveFilter(chip.id)}
-                        className={`flex items-center w-full px-4 py-3 rounded-xl transition-all ${
-                          isActive
-                            ? "bg-gradient-primary text-white shadow-md"
-                            : "bg-gray-50 text-gray-700 hover:bg-gray-100"
-                        }`}
+                        className={`flex items-center w-full px-4 py-3 rounded-xl transition-all ${isActive
+                          ? "bg-gradient-primary text-white shadow-md"
+                          : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                          }`}
                       >
                         <IconComponent className="w-5 h-5 mr-3" />
                         <span className="font-medium">{chip.label}</span>
@@ -202,7 +202,7 @@ const ProductsPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <div>
                 <p className="text-gray-600">
-                  Mostrando {filteredProducts.length} de {defaultProducts.length} productos
+                  Mostrando {filteredProducts.length} de {products.length} productos
                 </p>
               </div>
 
@@ -223,17 +223,15 @@ const ProductsPage: React.FC = () => {
                 <div className="flex bg-gray-100 rounded-xl p-1">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded-lg transition-colors ${
-                      viewMode === 'grid' ? 'bg-white shadow-sm' : 'hover:bg-gray-200'
-                    }`}
+                    className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'hover:bg-gray-200'
+                      }`}
                   >
                     <Grid3X3 className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-lg transition-colors ${
-                      viewMode === 'list' ? 'bg-white shadow-sm' : 'hover:bg-gray-200'
-                    }`}
+                    className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm' : 'hover:bg-gray-200'
+                      }`}
                   >
                     <List className="w-5 h-5" />
                   </button>
@@ -255,15 +253,14 @@ const ProductsPage: React.FC = () => {
                 </p>
               </div>
             ) : (
-              <div className={`grid gap-4 sm:gap-6 ${
-                viewMode === 'grid' 
-                  ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4' 
-                  : 'grid-cols-1'
-              }`}>
+              <div className={`grid gap-4 sm:gap-6 ${viewMode === 'grid'
+                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
+                : 'grid-cols-1'
+                }`}>
                 {filteredProducts.map((product) => (
-                  <ProductCard 
-                    key={product.id} 
-                    product={product} 
+                  <ProductCard
+                    key={product.id}
+                    product={product}
                     variant="catalog"
                     className={viewMode === 'list' ? 'max-w-none' : ''}
                   />

@@ -131,7 +131,17 @@ export function convertXlsToCsv(arrayBuffer: ArrayBuffer): ExcelConversionResult
             if (priceRaw === undefined || priceRaw === null) continue;
 
             // Price must be a number or parseable string
-            let price = typeof priceRaw === 'number' ? priceRaw : parseFloat(String(priceRaw).replace(',', '.'));
+            let price: number;
+            if (typeof priceRaw === 'number') {
+                price = priceRaw;
+            } else {
+                // Ensure we handle thousand separators (dots) and decimal separators (commas)
+                // 1. Remove dots (thousand separators)
+                // 2. Replace comma with dot (decimal separator)
+                const cleanStr = String(priceRaw).replace(/\./g, '').replace(',', '.');
+                price = parseFloat(cleanStr);
+            }
+
             if (isNaN(price)) continue;
 
             // Extract other fields

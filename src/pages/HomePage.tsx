@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Truck, CreditCard, Bed, Award } from 'lucide-react';
-import { defaultProducts } from '../defaultProducts';
+import { useProducts } from '../contexts/ProductContext';
 import ProductCard from '../components/public/ProductCard';
 
 const HomePage: React.FC = () => {
+  const { products } = useProducts();
   // Get featured products (first 6 products)
-  const featuredProducts = defaultProducts.slice(0, 6);
+  const featuredProducts = products.slice(0, 6);
 
   return (
     <div className="min-h-screen">

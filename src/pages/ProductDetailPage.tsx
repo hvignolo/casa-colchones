@@ -1,38 +1,40 @@
+```
 import React, { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Star, 
-  Heart, 
-  Share2, 
-  Phone, 
-  Truck, 
-  Shield, 
+import {
+  ArrowLeft,
+  Star,
+  Heart,
+  Share2,
+  Phone,
+  Truck,
+  Shield,
   CreditCard,
   Check,
   Search
 } from 'lucide-react';
-import { defaultProducts } from '../defaultProducts';
+import { useProducts } from '../contexts/ProductContext';
 import ProductCard from '../components/public/ProductCard';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { products } = useProducts();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
   // Find the product
   const product = useMemo(() => {
-    return defaultProducts.find(p => p.id === parseInt(id || '0'));
-  }, [id]);
+    return products.find(p => p.id === parseInt(id || '0'));
+  }, [id, products]);
 
   // Get related products (same type, different products)
   const relatedProducts = useMemo(() => {
     if (!product) return [];
-    return defaultProducts
+    return products
       .filter(p => p.tipo === product.tipo && p.id !== product.id)
       .slice(0, 4);
-  }, [product]);
+  }, [product, products]);
 
   const formatPrice = (price: number) => {
     return price.toLocaleString('es-AR', {
@@ -59,7 +61,7 @@ const ProductDetailPage: React.FC = () => {
               Código de producto: {id}
             </p>
           </div>
-          
+
           <div className="space-y-3">
             <Link
               to="/products"
@@ -136,15 +138,15 @@ const ProductDetailPage: React.FC = () => {
                 <button
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
-                  className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
-                    selectedImageIndex === index 
-                      ? 'border-primary shadow-md' 
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`w - 20 h - 20 rounded - xl overflow - hidden border - 2 transition - all ${
+  selectedImageIndex === index
+  ? 'border-primary shadow-md'
+  : 'border-gray-200 hover:border-gray-300'
+} `}
                 >
                   <img
                     src={image}
-                    alt={`${product.nombre} ${index + 1}`}
+                    alt={`${ product.nombre } ${ index + 1 } `}
                     className="w-full h-full object-cover"
                   />
                 </button>
@@ -248,8 +250,8 @@ const ProductDetailPage: React.FC = () => {
                     <Phone className="w-5 h-5 mr-2" />
                     Consultar Precio
                   </button>
-                  
-                  <button 
+
+                  <button
                     onClick={handleContactClick}
                     className="w-full bg-white border-2 border-primary text-primary py-4 rounded-full font-semibold hover:bg-primary hover:text-white transition-all duration-300"
                   >
@@ -306,8 +308,8 @@ const ProductDetailPage: React.FC = () => {
                     {product.detalles}
                   </p>
                   <p className="text-gray-700 leading-relaxed">
-                    Este {product.tipo.toLowerCase()} de {product.subtipo.toLowerCase()} está diseñado 
-                    para brindar el máximo confort y durabilidad. Fabricado con materiales de primera 
+                    Este {product.tipo.toLowerCase()} de {product.subtipo.toLowerCase()} está diseñado
+                    para brindar el máximo confort y durabilidad. Fabricado con materiales de primera
                     calidad y tecnología avanzada para garantizar un descanso reparador.
                   </p>
                 </div>
@@ -358,9 +360,9 @@ const ProductDetailPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {relatedProducts.map((relatedProduct) => (
-                <ProductCard 
-                  key={relatedProduct.id} 
-                  product={relatedProduct} 
+                <ProductCard
+                  key={relatedProduct.id}
+                  product={relatedProduct}
                   variant="catalog"
                 />
               ))}
