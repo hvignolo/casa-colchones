@@ -298,23 +298,47 @@ const AdminDashboard: React.FC = () => {
         }
         // --- DEBUG LOG END ---
 
-        // Limpiar precio
-        // Removing currency symbol and spaces
+        // Limpiar precio y espacios
         let cleanPrice = priceStr.replace(/[$\s]/g, '');
 
-        // LOGIC FOR ARGENTINE FORMAT (Dot thousands, Comma decimal)
-        // Case 1: Has comma (Explicit decimal separator) -> 1.234,56 or 1234,56
-        if (cleanPrice.includes(',')) {
-          cleanPrice = cleanPrice.replace(/\./g, '').replace(',', '.');
+        // ADVANCED FORMAT DETECTION
+        const firstCommaIndex = cleanPrice.indexOf(',');
+        const lastDotIndex = cleanPrice.lastIndexOf('.');
+
+        // Case A: Contains BOTH comma and dot (e.g. "1,234.56" or "1.234,56")
+        if (cleanPrice.includes(',') && cleanPrice.includes('.')) {
+          if (firstCommaIndex < lastDotIndex) {
+            // US Format: 1,234.56 -> Remove commas
+            cleanPrice = cleanPrice.replace(/,/g, '');
+          } else {
+            // AR/EU Format: 1.234,56 -> Remove dots, replace comma with dot
+            cleanPrice = cleanPrice.replace(/\./g, '').replace(',', '.');
+          }
         }
-        // Case 2: Only dots (Ambiguous: 1.234 could be 1234 or 1.234)
-        // In AR context, 3 decimals usually means thousands separator: 86.590 -> 86590
-        else if (/\.\d{3}$/.test(cleanPrice)) {
-          // If strictly 3 digits after last dot, assume thousands separator
-          cleanPrice = cleanPrice.replace(/\./g, '');
+        // Case B: Contains ONLY comma (e.g. "1234,56" or "1,234")
+        else if (cleanPrice.includes(',')) {
+          // If strictly 3 digits after comma, it MIGHT be thousands (1,000), 
+          // but in prices usually comma is decimal in AR.
+          // However, based on user history, "173,18" was appearing.
+          // Let's assume comma is decimal separator UNLESS we are sure it's US integer
+          cleanPrice = cleanPrice.replace(',', '.');
         }
-        // Case 3: Standard decimal (US) or plain number -> 100 or 100.50
-        // (Nothing to do, parseFloat handles it)
+        // Case C: Contains ONLY dot (e.g. "1234.56" or "1.234")
+        else if (cleanPrice.includes('.')) {
+          // If looks like thousands separator (1.234), remove it.
+          // If standard decimal (1234.56), leave it.
+          // In AR, dot is thousands. In US, dot is decimal.
+          // Since previous file had "86,590.71" (US format), likely single dot is decimal too.
+          // So 1234.56 is 1234.56.
+          // NO-OP.
+          if (/\.\d{3}$/.test(cleanPrice) && (cleanPrice.match(/\./g) || []).length >= 1) {
+            // If it has multiple dots (1.234.567) or matches thousands pattern strictly
+            // and we are in a mixed environment... tricky.
+            // Given the log showed "$ 86,590.71", this is strictly US format.
+            // So 1234.56 is 1234.56.
+            // NO-OP.
+          }
+        }
 
         const price = parseFloat(cleanPrice);
 
