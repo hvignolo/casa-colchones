@@ -34,6 +34,7 @@ import { ProductImage } from "./ProductImage";
 import { useAuth } from './contexts/AuthContext';
 import { convertXmlToCsv } from './xmlToCsvConverter';
 import { convertXlsToCsv } from './xlsToCsvConverter';
+import { useProducts } from './contexts/ProductContext';
 
 // Tipos para la integración
 interface CalculatorPreloadData {
@@ -48,7 +49,7 @@ interface CalculatorPreloadData {
 // Removed unused Armchair component
 
 // ... imports
-import { useProducts } from './contexts/ProductContext'; // Add this import
+
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();

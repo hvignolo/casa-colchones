@@ -71,6 +71,15 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
     };
 
+    const deleteProduct = async (productId: string) => {
+        try {
+            await deleteDoc(doc(db, "products", productId));
+        } catch (error) {
+            console.error("Error deleting product:", error);
+            throw error;
+        }
+    };
+
     return (
         <ProductContext.Provider value={{ products, loading, updateProduct, updateProductsBatch, deleteProduct }}>
             {children}

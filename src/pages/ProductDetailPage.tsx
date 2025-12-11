@@ -1,4 +1,4 @@
-```
+
 import React, { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
@@ -138,15 +138,14 @@ const ProductDetailPage: React.FC = () => {
                 <button
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
-                  className={`w - 20 h - 20 rounded - xl overflow - hidden border - 2 transition - all ${
-  selectedImageIndex === index
-  ? 'border-primary shadow-md'
-  : 'border-gray-200 hover:border-gray-300'
-} `}
+                  className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${selectedImageIndex === index
+                      ? 'border-primary shadow-md'
+                      : 'border-gray-200 hover:border-gray-300'
+                    }`}
                 >
                   <img
                     src={image}
-                    alt={`${ product.nombre } ${ index + 1 } `}
+                    alt={`${product.nombre} ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
                 </button>
