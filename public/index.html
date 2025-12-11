@@ -42,5 +42,23 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <script>
+      // CRITICAL: Force unregister any existing service workers immediately
+      // This prevents "Zombie" service workers from serving incorrect cached files
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister().then(function(success) {
+              console.log('Service Worker force unregistered:', success);
+              // Optional: reload if we successfully unregistered one and it might have been controlling the page
+               if (success && !sessionStorage.getItem('reloaded')) {
+                   sessionStorage.setItem('reloaded', 'true');
+                   window.location.reload();
+               }
+            });
+          }
+        });
+      }
+    </script>
   </body>
 </html>
