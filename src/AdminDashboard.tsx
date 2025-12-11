@@ -289,7 +289,17 @@ const AdminDashboard: React.FC = () => {
           normalizedCode = parseInt(codeRaw, 10).toString();
         }
 
+        // --- DEBUG LOG START ---
+        if (normalizedCode === "500040" || normalizedCode === "500040") {
+          console.log(`[CSV DEBUG] Processing Code: ${normalizedCode}`);
+          console.log(`[CSV DEBUG] Raw Line: ${line}`);
+          console.log(`[CSV DEBUG] Cols detected:`, cols);
+          console.log(`[CSV DEBUG] Price String (Before Clean): '${priceStr}'`);
+        }
+        // --- DEBUG LOG END ---
+
         // Limpiar precio
+        // Removing currency symbol and spaces
         let cleanPrice = priceStr.replace(/[$\s]/g, '');
 
         // LOGIC FOR ARGENTINE FORMAT (Dot thousands, Comma decimal)
@@ -307,6 +317,13 @@ const AdminDashboard: React.FC = () => {
         // (Nothing to do, parseFloat handles it)
 
         const price = parseFloat(cleanPrice);
+
+        // --- DEBUG LOG START ---
+        if (normalizedCode === "500040") {
+          console.log(`[CSV DEBUG] Cleaned Price String: '${cleanPrice}'`);
+          console.log(`[CSV DEBUG] Parsed Price Number: ${price}`);
+        }
+        // --- DEBUG LOG END ---
 
         if (!isNaN(price)) {
           priceMap[normalizedCode] = price;
