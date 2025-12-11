@@ -11,10 +11,10 @@ export class PWAInstaller {
   private async init() {
     // Detectar si ya está instalado
     this.checkIfInstalled();
-    
+
     // Configurar listeners
     this.setupEventListeners();
-    
+
     // Registrar Service Worker con manejo mejorado de errores
     await this.registerServiceWorker();
   }
@@ -105,10 +105,10 @@ export class PWAInstaller {
         const newWorker = registration.installing;
         if (newWorker) {
           console.log('New Service Worker found, installing...');
-          
+
           newWorker.addEventListener('statechange', () => {
             console.log('Service Worker state changed:', newWorker.state);
-            
+
             if (newWorker.state === 'installed') {
               if (navigator.serviceWorker.controller) {
                 // Hay una nueva versión disponible
@@ -139,17 +139,33 @@ export class PWAInstaller {
 
     } catch (error) {
       console.error('Service Worker registration failed:', error);
-      
-      // Diagnóstico de errores comunes
-      if (error instanceof TypeError) {
-        console.error('Possible causes:');
-        console.error('- Service Worker file not found or incorrect MIME type');
-        console.error('- Network issues preventing SW download');
-        console.error('- CORS issues with SW file');
-      }
-      
       // Continuar sin Service Worker
       console.log('App will work without offline capabilities');
+    }
+  }
+
+  /**
+   * Desregistra cualquier service worker existente para forzar una limpieza de caché
+   */
+  public async unregisterServiceWorker(): Promise<void> {
+    if ('serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          await registration.unregister();
+          console.log('Service Worker unregistered successfully - Cache cleared');
+          if (caches) {
+            // Limpiar también la caché de archivos
+            const cacheKeys = await caches.keys();
+            await Promise.all(
+              cacheKeys.map(key => caches.delete(key))
+            );
+          }
+          // window.location.reload(); // Removed to prevent reload loops
+        }
+      } catch (error) {
+        console.error('Error unregistering SW:', error);
+      }
     }
   }
 
@@ -161,7 +177,7 @@ export class PWAInstaller {
     if (!this.installButton) {
       this.createInstallButton();
     }
-    
+
     if (this.installButton) {
       this.installButton.style.display = 'flex';
     }
@@ -196,7 +212,7 @@ export class PWAInstaller {
       font-medium text-sm
     `.trim();
     this.installButton.style.display = 'none';
-    
+
     this.installButton.addEventListener('click', () => {
       this.installPWA();
     });
@@ -216,12 +232,12 @@ export class PWAInstaller {
     try {
       // Mostrar el prompt de instalación
       this.deferredPrompt.prompt();
-      
+
       // Esperar la respuesta del usuario
       const { outcome } = await this.deferredPrompt.userChoice;
-      
+
       console.log('User choice:', outcome);
-      
+
       if (outcome === 'accepted') {
         console.log('User accepted the install prompt');
         this.hideInstallButton();
@@ -254,9 +270,9 @@ export class PWAInstaller {
         </div>
       </div>
     `;
-    
+
     document.body.appendChild(successMessage);
-    
+
     // Remover después de 3 segundos
     setTimeout(() => {
       if (document.body.contains(successMessage)) {
@@ -285,9 +301,9 @@ export class PWAInstaller {
         </div>
       </div>
     `;
-    
+
     document.body.appendChild(updateMessage);
-    
+
     // Manejar click en actualizar
     const updateBtn = document.getElementById('updateBtn');
     updateBtn?.addEventListener('click', () => {
@@ -313,7 +329,7 @@ export class PWAInstaller {
         if (registration && registration.waiting) {
           // Enviar mensaje al SW para que se active
           registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-          
+
           // Escuchar cuando el nuevo SW tome control
           navigator.serviceWorker.addEventListener('controllerchange', () => {
             // Recargar la página para usar la nueva versión
@@ -371,9 +387,9 @@ export class PWAInstaller {
         </div>
       </div>
     `;
-    
+
     document.body.appendChild(syncMessage);
-    
+
     setTimeout(() => {
       if (document.body.contains(syncMessage)) {
         document.body.removeChild(syncMessage);
@@ -433,7 +449,7 @@ export class PWAInstaller {
    */
   private detectPlatform(): string {
     const userAgent = navigator.userAgent.toLowerCase();
-    
+
     if (/android/.test(userAgent)) {
       return 'Android';
     } else if (/iphone|ipad|ipod/.test(userAgent)) {
@@ -445,7 +461,7 @@ export class PWAInstaller {
     } else if (/linux/.test(userAgent)) {
       return 'Linux';
     }
-    
+
     return 'Unknown';
   }
 
@@ -473,7 +489,7 @@ export class PWAInstaller {
    */
   private fallbackShare(data: ShareData) {
     const text = `${data.title || ''}\n${data.text || ''}\n${data.url || ''}`;
-    
+
     if ('clipboard' in navigator && navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
         console.log('Content copied to clipboard');
@@ -498,14 +514,14 @@ export class PWAInstaller {
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
-    
+
     try {
       document.execCommand('copy');
       console.log('Content copied using execCommand');
     } catch (err) {
       console.error('Failed to copy using execCommand:', err);
     }
-    
+
     document.body.removeChild(textArea);
   }
 
@@ -545,12 +561,12 @@ export const initializePWA = () => {
   console.log('Initializing PWA...');
   const pwaInfo = pwaInstaller.getPWAInfo();
   console.log('PWA Info:', pwaInfo);
-  
+
   // Escuchar eventos personalizados
   window.addEventListener('pwaInstallAvailable', () => {
     console.log('PWA install is now available');
   });
-  
+
   return pwaInstaller;
 };
 
