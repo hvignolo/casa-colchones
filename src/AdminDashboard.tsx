@@ -270,42 +270,41 @@ const AdminDashboard: React.FC = () => {
       const codeRaw = cols[0]?.trim();
       let priceStr = cols[3]?.trim();
 
-      // HEURISTIC FIX for unquoted comma-decimal in comma-delimited files
-      // Situation: File is comma-delimited, but price is written as 86.590,71 (no quotes).
-      // The parser splits this into col[3]="86.590" and col[4]="71".
-      // We assume if delimiter is ',' AND col[4] looks like cents, we merge.
+      // HEURISTIC FIX for split columns (e.g. "86.590,71" split into "86.590" and "71")
+      // Check if current price is missing decimals or looks incomplete, and next col is numeric
       if (delimiter === ',' && cols[4]) {
-        // Check if col[3] looks like a number ends (digits) and col[4] is short numeric
-        // This is risky but solves the "173,18" instead of "173.180" problem.
-        const looksLikeSplitPrice = /[\d\.]+$/.test(priceStr || '') && /^\d{1,2}$/.test(cols[4].trim());
+        // Relaxed check: valid if next col is 1-3 digits (e.g. 5, 50, 500)
+        const nextColLooksLikeCents = /^\d{1,3}$/.test(cols[4].trim());
+        // Check if current price part looks like it ends in a number (not a text field)
+        const currentLooksLikePricePart = /[\d\.]+$/.test(priceStr || '');
 
-        if (looksLikeSplitPrice) {
+        if (currentLooksLikePricePart && nextColLooksLikeCents) {
           priceStr = `${priceStr},${cols[4].trim()}`;
         }
       }
 
       if (codeRaw && priceStr) {
-        // Normalizar código
         let normalizedCode = codeRaw;
-        // Intentar parsear como numero para quitar ceros a la izquierda si es puramente numérico
-        // pero mantener como string.
         if (!isNaN(Number(codeRaw))) {
           normalizedCode = parseInt(codeRaw, 10).toString();
         }
 
-        // Limpiar y parsear precio
-        // 1. Remover símbolo de moneda y espacios
+        // Limpiar precio
         let cleanPrice = priceStr.replace(/[$\s]/g, '');
 
-        // 2. Manejar formato argentino/europeo (1.234,56) vs internacional (1,234.56)
-        // Heurística: Si hay comas y puntos
-        if (cleanPrice.includes(',') && cleanPrice.includes('.')) {
-          // Asumimos formato AR: 1.000,00 -> eliminar puntos, reemplazar coma por punto
+        // LOGIC FOR ARGENTINE FORMAT (Dot thousands, Comma decimal)
+        // Case 1: Has comma (Explicit decimal separator) -> 1.234,56 or 1234,56
+        if (cleanPrice.includes(',')) {
           cleanPrice = cleanPrice.replace(/\./g, '').replace(',', '.');
-        } else if (cleanPrice.includes(',')) {
-          // Solo comas: 100,50 -> 100.50 OR 86590,71 -> 86590.71
-          cleanPrice = cleanPrice.replace(',', '.');
         }
+        // Case 2: Only dots (Ambiguous: 1.234 could be 1234 or 1.234)
+        // In AR context, 3 decimals usually means thousands separator: 86.590 -> 86590
+        else if (/\.\d{3}$/.test(cleanPrice)) {
+          // If strictly 3 digits after last dot, assume thousands separator
+          cleanPrice = cleanPrice.replace(/\./g, '');
+        }
+        // Case 3: Standard decimal (US) or plain number -> 100 or 100.50
+        // (Nothing to do, parseFloat handles it)
 
         const price = parseFloat(cleanPrice);
 
