@@ -242,23 +242,47 @@ const AdminDashboard: React.FC = () => {
     const priceMap: Record<string, number> = {};
 
     lines.forEach((line) => {
-      // Usar regex para separar por comas pero ignorar las que están dentro de comillas
-      const matches = line.match(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/g);
+      let cols: string[] = [];
+      let delimiter = ',';
 
-      if (!matches) return;
-
-      const cols = matches.map(col => {
-        // Eliminar la coma inicial si existe (dado el regex) y las comillas envolventes
-        let val = col.startsWith(',') ? col.slice(1) : col;
-        val = val.trim();
-        if (val.startsWith('"') && val.endsWith('"')) {
-          val = val.slice(1, -1).replace(/""/g, '"');
+      // Detect delimiter strategy:
+      // If the line has semicolons, it's likely a standard AR/EU CSV export.
+      if (line.includes(';')) {
+        delimiter = ';';
+        cols = line.split(';').map(c => c.trim().replace(/^"|"$/g, ''));
+      } else {
+        // Fallback to comma with regex for quoted fields
+        const matches = line.match(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/g);
+        if (matches) {
+          cols = matches.map(col => {
+            let val = col.startsWith(',') ? col.slice(1) : col;
+            val = val.trim();
+            if (val.startsWith('"') && val.endsWith('"')) {
+              val = val.slice(1, -1).replace(/""/g, '"');
+            }
+            return val;
+          });
         }
-        return val;
-      });
+      }
+
+      if (cols.length === 0) return;
 
       const codeRaw = cols[0]?.trim();
       let priceStr = cols[3]?.trim();
+
+      // HEURISTIC FIX for unquoted comma-decimal in comma-delimited files
+      // Situation: File is comma-delimited, but price is written as 86.590,71 (no quotes).
+      // The parser splits this into col[3]="86.590" and col[4]="71".
+      // We assume if delimiter is ',' AND col[4] looks like cents, we merge.
+      if (delimiter === ',' && cols[4]) {
+        // Check if col[3] looks like a number ends (digits) and col[4] is short numeric
+        // This is risky but solves the "173,18" instead of "173.180" problem.
+        const looksLikeSplitPrice = /[\d\.]+$/.test(priceStr || '') && /^\d{1,2}$/.test(cols[4].trim());
+
+        if (looksLikeSplitPrice) {
+          priceStr = `${priceStr},${cols[4].trim()}`;
+        }
+      }
 
       if (codeRaw && priceStr) {
         // Normalizar código
@@ -279,13 +303,9 @@ const AdminDashboard: React.FC = () => {
           // Asumimos formato AR: 1.000,00 -> eliminar puntos, reemplazar coma por punto
           cleanPrice = cleanPrice.replace(/\./g, '').replace(',', '.');
         } else if (cleanPrice.includes(',')) {
-          // Solo comas: 100,50 -> 100.50
+          // Solo comas: 100,50 -> 100.50 OR 86590,71 -> 86590.71
           cleanPrice = cleanPrice.replace(',', '.');
         }
-        // Si solo hay puntos (1.500), es ambiguo, pero parseFloat lo maneja como 1.5 si es decimal
-        // o si es separador de miles se rompe. 
-        // Asumiendo que si viene de Excel/CSV AR, los miles usan punto.
-        // Pero si es conversión interna (XLS->CSV), viene como 1500.00 (formato standard JS).
 
         const price = parseFloat(cleanPrice);
 
