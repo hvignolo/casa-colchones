@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -19,7 +19,7 @@ const AppRouter: React.FC = () => {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <BrowserRouter basename={process.env.PUBLIC_URL}>
+        <HashRouter>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<PublicLayout />}>
@@ -45,7 +45,7 @@ const AppRouter: React.FC = () => {
             {/* 404 Page */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
       </AuthProvider>
     </ErrorBoundary>
   );
