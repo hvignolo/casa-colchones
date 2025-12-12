@@ -10,7 +10,10 @@ import {
   Edit,
   Trash2,
   Save,
+  Loader,
 } from 'lucide-react';
+import { storage } from './firebaseConfig';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
   Product,
   StoreData,
@@ -81,6 +84,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         marca: "",
       }
     );
+    const [uploading, setUploading] = useState(false);
 
     // IDs únicos para este formulario
     const formIds = {
@@ -103,6 +107,29 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         precioContado: Number(formData.precioContado),
         precioTarjeta: Number(formData.precioTarjeta),
       });
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      try {
+        setUploading(true);
+        // Create a unique filename using timestamp
+        const timestamp = Date.now();
+        const fileName = `products/${timestamp}_${file.name}`;
+        const storageRef = ref(storage, fileName);
+
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+
+        setFormData({ ...formData, image: downloadURL });
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        alert("Error al subir la imagen. Por favor intente nuevamente.");
+      } finally {
+        setUploading(false);
+      }
     };
 
     return (
@@ -262,21 +289,73 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           <div>
-            <label htmlFor={formIds.image} className="block text-sm font-medium text-gray-700 mb-1">
-              URL de Imagen
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Imagen del Producto
             </label>
-            <input
-              type="url"
-              id={formIds.image}
-              name="image"
-              value={formData.image}
-              onChange={(e) =>
-                setFormData({ ...formData, image: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="https://..."
-              autoComplete="url"
-            />
+
+            <div className="space-y-3">
+              {/* Image Preview */}
+              {formData.image && (
+                <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                  <img
+                    src={formData.image}
+                    alt="Preview"
+                    className="w-full h-full object-contain"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, image: '' })}
+                    className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-md text-red-600 hover:bg-red-50"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Upload Input */}
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="url"
+                    id={formIds.image}
+                    name="image"
+                    value={formData.image}
+                    onChange={(e) =>
+                      setFormData({ ...formData, image: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pl-10"
+                    placeholder="https://... o subir imagen"
+                    disabled={uploading}
+                  />
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                    {uploading ? (
+                      <Loader className="w-4 h-4 text-blue-600 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4 text-gray-400" />
+                    )}
+                  </div>
+                </div>
+
+                <input
+                  type="file"
+                  id={`file-upload-${formIds.image}`}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                />
+                <label
+                  htmlFor={`file-upload-${formIds.image}`}
+                  className={`px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium cursor-pointer hover:bg-gray-200 transition-colors flex items-center gap-2 ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
+                >
+                  <Upload className="w-4 h-4" />
+                  Subir
+                </label>
+              </div>
+              <p className="text-xs text-gray-500">
+                Sube una imagen desde tu dispositivo o pega una URL externa.
+              </p>
+            </div>
           </div>
 
           <div>
