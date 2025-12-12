@@ -9,7 +9,7 @@ const ProductsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('TODOS');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000000]);
-  const [sortBy, setSortBy] = useState<'name' | 'price-low' | 'price-high' | 'newest'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'price-low' | 'price-high' | 'newest'>('newest');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
 
@@ -54,6 +54,12 @@ const ProductsPage: React.FC = () => {
     );
 
     // Apply sorting
+    // Create a copy to avoid mutating the original products array from context
+    // if no filters were applied (which would have already created a new array)
+    if (filtered === products) {
+      filtered = [...filtered];
+    }
+
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'price-low':
@@ -187,7 +193,7 @@ const ProductsPage: React.FC = () => {
                   setActiveFilter('TODOS');
                   setSearchQuery('');
                   setPriceRange([0, maxPrice]);
-                  setSortBy('name');
+                  setSortBy('newest');
                 }}
                 className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-medium transition-colors"
               >
@@ -213,10 +219,10 @@ const ProductsPage: React.FC = () => {
                   onChange={(e) => setSortBy(e.target.value as any)}
                   className="bg-white border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                 >
+                  <option value="newest">Más recientes</option>
                   <option value="name">Ordenar por nombre</option>
                   <option value="price-low">Precio: menor a mayor</option>
                   <option value="price-high">Precio: mayor a menor</option>
-                  <option value="newest">Más recientes</option>
                 </select>
 
                 {/* View Mode Toggle */}
