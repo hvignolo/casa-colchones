@@ -113,11 +113,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       const file = e.target.files?.[0];
       if (!file) return;
 
+      if (!formData.codigo) {
+        // Validation handled by UI state
+        return;
+      }
+
       try {
         setUploading(true);
-        // Create a unique filename using timestamp
-        const timestamp = Date.now();
-        const fileName = `products/${timestamp}_${file.name}`;
+        // Use product code as filename to ensure 1:1 mapping (overwrites existing)
+        // We don't need extension in the path, Firebase handles Content-Type
+        const fileName = `products/${formData.codigo}`;
         const storageRef = ref(storage, fileName);
 
         await uploadBytes(storageRef, file);
@@ -346,14 +351,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 />
                 <label
                   htmlFor={`file-upload-${formIds.image}`}
-                  className={`px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium cursor-pointer hover:bg-gray-200 transition-colors flex items-center gap-2 ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
+                  className={`px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium cursor-pointer hover:bg-gray-200 transition-colors flex items-center gap-2 ${uploading || !formData.codigo ? 'opacity-50 pointer-events-none' : ''}`}
                 >
                   <Upload className="w-4 h-4" />
                   Subir
                 </label>
               </div>
               <p className="text-xs text-gray-500">
-                Sube una imagen desde tu dispositivo o pega una URL externa.
+                {!formData.codigo
+                  ? "⚠️ Ingrese el CODIGO del producto para habilitar la subida de imagen."
+                  : "Sube una imagen desde tu dispositivo o pega una URL externa."
+                }
               </p>
             </div>
           </div>
