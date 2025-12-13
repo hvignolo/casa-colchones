@@ -14,6 +14,7 @@ import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import AdminLogin from './pages/AdminLogin';
 import NotFoundPage from './pages/NotFoundPage';
+import PersonalAccountsPage from './pages/PersonalAccountsPage';
 
 const AppRouter: React.FC = () => {
   return (
@@ -35,6 +36,14 @@ const AppRouter: React.FC = () => {
               element={
                 <ProtectedRoute>
                   <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/cuentas"
+              element={
+                <ProtectedRoute>
+                  <PersonalAccountsPage />
                 </ProtectedRoute>
               }
             />

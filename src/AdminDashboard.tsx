@@ -746,6 +746,14 @@ const AdminDashboard: React.FC = () => {
               >
                 <Calculator className="w-6 h-6 text-gray-600" />
               </button>
+              {/* Botón para cuentas corrientes */}
+              <button
+                onClick={() => navigate('/admin/cuentas')}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                title="Cuentas Corrientes"
+              >
+                <User className="w-6 h-6 text-gray-600" />
+              </button>
               {/* Botón para crear cartola de precios */}
               <button
                 onClick={() => setShowCartola(true)}

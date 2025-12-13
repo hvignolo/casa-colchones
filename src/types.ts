@@ -121,15 +121,15 @@ export interface PaymentRates {
 }
 
 // Tipos para los estilos de cartola (si se necesitan en otros lugares)
-export type EstiloCartola = 
-  | 'modern' 
-  | 'original' 
-  | 'minimal' 
-  | 'gradient' 
-  | 'dark' 
-  | 'geometric' 
-  | 'wellness' 
-  | 'sale' 
+export type EstiloCartola =
+  | 'modern'
+  | 'original'
+  | 'minimal'
+  | 'gradient'
+  | 'dark'
+  | 'geometric'
+  | 'wellness'
+  | 'sale'
   | 'delicate';
 
 // Interfaz para los datos de una cartola
@@ -237,7 +237,7 @@ export type ProductType = typeof PRODUCT_TYPES[keyof typeof PRODUCT_TYPES];
 // Constantes para los filtros
 export const FILTER_IDS = {
   TODOS: 'TODOS',
-  COLCHONES: 'COLCHONES', 
+  COLCHONES: 'COLCHONES',
   SOMMIERS: 'SOMMIERS',
   RESORTES: 'RESORTES',
   ESPUMA: 'ESPUMA',
@@ -247,3 +247,25 @@ export const FILTER_IDS = {
 } as const;
 
 export type FilterId = typeof FILTER_IDS[keyof typeof FILTER_IDS];
+
+// Interface for Personal Accounts (Tracking installment sales without cards)
+export interface PersonalAccount {
+  id?: string; // Optional for creation, populated from Firestore
+  customerName: string;
+  dni?: string;     // Optional identification
+  phone?: string;   // Optional contact info
+  address?: string; // Optional delivery address
+  productDetails: string;
+  initialPayment?: number; // Entrega inicial
+  initialPaymentMethod?: string; // Medio de pago de la entrega
+  totalInstallments: number;
+  paidInstallments: number;
+  amountPerInstallment: number;
+  isDelivered: boolean;
+  startDate: string; // ISO date string
+  lastPaymentDate?: string; // ISO date string
+  status: 'active' | 'completed' | 'late' | 'canceled';
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
