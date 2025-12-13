@@ -11,6 +11,8 @@ export interface Product {
   detalles: string;
   image: string;
   marca: string;
+  stock?: number;
+  images?: string[];
 }
 
 // Interfaz para los datos de la tienda

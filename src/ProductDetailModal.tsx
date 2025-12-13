@@ -1,29 +1,9 @@
 import React, { useState } from 'react';
 import { X, Calculator, CreditCard } from 'lucide-react';
 import { useFinancingCalculator } from './useFinancingCalculator';
+import { useEffect } from 'react';
 
-// Tipos TypeScript
-interface Product {
-  id: number;
-  codigo: string;
-  nombre: string;
-  medidas: string;
-  tipo: string;
-  subtipo: string;
-  precioContado: number;
-  precioTarjeta: number;
-  detalles: string;
-  image: string;
-  marca: string;
-}
-
-interface StoreData {
-  name: string;
-  location: string;
-  phone: string;
-  email: string;
-  hours: string;
-}
+import { Product, StoreData } from './types';
 
 interface CalculatorPreloadData {
   amount: number;
@@ -42,9 +22,9 @@ interface ProductDetailModalProps {
   onCreateCartola?: (product: Product) => void;
 }
 
-const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ 
-  product, 
-  storeData, 
+const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
+  product,
+  storeData,
   onClose,
   onOpenCalculator,
   onCreateCartola
@@ -53,6 +33,13 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const [selectedCard, setSelectedCard] = useState<string>('viumi');
   const [selectedInstallments, setSelectedInstallments] = useState<number>(6);
   const [useMacroPromo, setUseMacroPromo] = useState<boolean>(true);
+  const [activeImage, setActiveImage] = useState<string>('');
+
+  useEffect(() => {
+    if (product) {
+      setActiveImage(product.image);
+    }
+  }, [product]);
 
   // Cálculo de financiación usando el hook personalizado (ANTES del return condicional)
   const financingCalculation = useFinancingCalculator({
@@ -159,12 +146,35 @@ ${imageUrl}
         <div className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
-              <div className="aspect-square bg-gray-100 rounded-2xl overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.nombre}
-                  className="w-full h-full object-cover"
-                />
+              <div className="space-y-4">
+                <div className="aspect-square bg-gray-100 rounded-2xl overflow-hidden shadow-inner">
+                  <img
+                    src={activeImage || product.image}
+                    alt={product.nombre}
+                    className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                {/* Thumbnails */}
+                {(product.images && product.images.length > 0) && (
+                  <div className="flex gap-2 justify-center overflow-x-auto pb-2">
+                    {[product.image, ...product.images].map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveImage(img)}
+                        className={`w-16 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${activeImage === img
+                            ? 'border-blue-600 shadow-md scale-105'
+                            : 'border-transparent hover:border-gray-300'
+                          }`}
+                      >
+                        <img
+                          src={img}
+                          alt={`View ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="flex justify-center">
                 <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
@@ -180,7 +190,7 @@ ${imageUrl}
                     Opciones de Financiación
                   </h3>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm text-gray-600 mb-2">
@@ -324,7 +334,7 @@ ${imageUrl}
               </div>
 
               <div className="space-y-3">
-                <button 
+                <button
                   onClick={shareOnWhatsApp}
                   className="w-full bg-green-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                 >
@@ -333,7 +343,7 @@ ${imageUrl}
                   </svg>
                   Compartir por WhatsApp
                 </button>
-                <button 
+                <button
                   onClick={handleCreateCartola}
                   className="w-full bg-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
                 >

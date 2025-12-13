@@ -870,6 +870,9 @@ const AdminDashboard: React.FC = () => {
                         <th className="text-left py-4 px-4 text-sm font-semibold text-gray-900">
                           Código
                         </th>
+                        <th className="text-center py-4 px-4 text-sm font-semibold text-gray-900">
+                          Stock
+                        </th>
                         <th className="text-left py-4 px-4 text-sm font-semibold text-gray-900">
                           Tipo
                         </th>
@@ -919,6 +922,9 @@ const AdminDashboard: React.FC = () => {
                           </td>
                           <td className="py-4 px-4 text-sm text-gray-900 font-mono">
                             {product.codigo}
+                          </td>
+                          <td className="py-4 px-4 text-center text-sm text-gray-900">
+                            {product.stock !== undefined ? product.stock : 0}
                           </td>
                           <td className="py-4 px-4">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">

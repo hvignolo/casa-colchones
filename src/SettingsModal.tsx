@@ -82,7 +82,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         detalles: "",
         image: "",
         marca: "",
-      }
+        stock: 0,
+      } as Product
     );
     const [uploading, setUploading] = useState(false);
 
@@ -98,6 +99,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       precioTarjeta: generateId('product-precio-tarjeta'),
       image: generateId('product-image'),
       detalles: generateId('product-detalles'),
+      stock: generateId('product-stock'),
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -106,6 +108,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         ...formData,
         precioContado: Number(formData.precioContado),
         precioTarjeta: Number(formData.precioTarjeta),
+        stock: Number(formData.stock),
       });
     };
 
@@ -114,14 +117,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       if (!file) return;
 
       if (!formData.codigo) {
-        // Validation handled by UI state
         return;
       }
 
       try {
         setUploading(true);
-        // Use product code as filename to ensure 1:1 mapping (overwrites existing)
-        // We don't need extension in the path, Firebase handles Content-Type
         const fileName = `products/${formData.codigo}`;
         const storageRef = ref(storage, fileName);
 
@@ -135,6 +135,45 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       } finally {
         setUploading(false);
       }
+    };
+
+    const handleAdditionalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      if (!formData.codigo) return;
+
+      try {
+        setUploading(true);
+        // Use a suffix for additional images
+        const fileName = `products/${formData.codigo}_extra_${index}_${Date.now()}`;
+        const storageRef = ref(storage, fileName);
+
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+
+        const currentImages = formData.images || [];
+        const newImages = [...currentImages];
+        // Ensure array has enough slots
+        if (index >= newImages.length) {
+          newImages.push(downloadURL);
+        } else {
+          newImages[index] = downloadURL;
+        }
+
+        setFormData({ ...formData, images: newImages });
+      } catch (error) {
+        console.error("Error uploading additional image:", error);
+        alert("Error al subir imagen adicional.");
+      } finally {
+        setUploading(false);
+      }
+    };
+
+    const removeAdditionalImage = (index: number) => {
+      const currentImages = formData.images || [];
+      const newImages = currentImages.filter((_, i) => i !== index);
+      setFormData({ ...formData, images: newImages });
     };
 
     return (
@@ -195,7 +234,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label htmlFor={formIds.tipo} className="block text-sm font-medium text-gray-700 mb-1">
                 Tipo
@@ -231,6 +270,22 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Ej: Viscoelástico, Resortes, etc."
                 autoComplete="off"
+              />
+            </div>
+            <div>
+              <label htmlFor={formIds.stock} className="block text-sm font-medium text-gray-700 mb-1">
+                Stock
+              </label>
+              <input
+                type="number"
+                id={formIds.stock}
+                name="stock"
+                value={formData.stock || 0}
+                onChange={(e) =>
+                  setFormData({ ...formData, stock: Number(e.target.value) })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                min="0"
               />
             </div>
           </div>
@@ -363,6 +418,58 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   : "Sube una imagen desde tu dispositivo o pega una URL externa."
                 }
               </p>
+            </div>
+
+            {/* Additional Images Section */}
+            <div className="mt-4 border-t pt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Imágenes Adicionales (Máx. 3)
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {[0, 1, 2].map((i) => {
+                  const hasImage = formData.images && formData.images[i];
+                  return (
+                    <div key={i} className="relative aspect-square bg-gray-50 rounded-lg border border-gray-200 overflow-hidden flex items-center justify-center">
+                      {hasImage ? (
+                        <>
+                          <img
+                            src={formData.images![i]}
+                            alt={`Extra ${i}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeAdditionalImage(i)}
+                            className="absolute top-1 right-1 p-1 bg-white rounded-full shadow-sm text-red-600 hover:bg-red-50"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </>
+                      ) : (
+                        <div className="text-center p-2">
+                          <input
+                            type="file"
+                            id={`extra-img-${i}`}
+                            className="hidden"
+                            accept="image/*"
+                            onChange={(e) => handleAdditionalImageUpload(e, i)}
+                            disabled={uploading || !formData.codigo}
+                          />
+                          <label
+                            htmlFor={`extra-img-${i}`}
+                            className={`block text-xs text-gray-500 cursor-pointer hover:text-blue-600 ${uploading || !formData.codigo ? 'opacity-50 pointer-events-none' : ''}`}
+                          >
+                            <div className="flex flex-col items-center">
+                              <Plus className="w-5 h-5 mb-1" />
+                              <span>Agregar</span>
+                            </div>
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
