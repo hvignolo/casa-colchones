@@ -270,3 +270,12 @@ export interface PersonalAccount {
   createdAt?: string;
   updatedAt?: string;
 }
+
+// Interface for Cash Sales (Ventas Contado)
+export interface CashSale {
+  id?: string;
+  amount: number;
+  description: string;
+  date: string; // ISO string
+  createdAt: string;
+}

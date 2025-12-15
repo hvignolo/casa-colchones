@@ -7,11 +7,16 @@ import {
   LogOut,
   Calculator,
   FilePlus,
+  DollarSign,
+  CreditCard
 } from "lucide-react";
 
 // Importamos los componentes y datos refactorizados
-import { Product, StoreData } from "./types";
+import { Product, StoreData, CashSale } from "./types";
 import { defaultProducts } from "./defaultProducts";
+import { DashboardMetrics } from "./components/admin/DashboardMetrics";
+import { CashSaleModal } from "./components/admin/CashSaleModal";
+import { useCashSales } from "./hooks/useCashSales";
 import { FILTER_CHIPS } from "./components/IconComponents";
 import {
   TARJETA_FACTOR,
@@ -72,6 +77,7 @@ const AdminDashboard: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
   const [showCartola, setShowCartola] = useState(false);
+  const [showCashSaleModal, setShowCashSaleModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -92,6 +98,8 @@ const AdminDashboard: React.FC = () => {
 
   // Datos de la tienda con persistencia global (Firebase)
   const { storeData, updateStoreData } = useStore();
+  const { addCashSale } = useCashSales();
+
 
   // Registrar Service Worker - Versión para producción y GitHub Pages
   useEffect(() => {
@@ -562,6 +570,17 @@ const AdminDashboard: React.FC = () => {
     setShowCartola(true);
   };
 
+  const handleSaveCashSale = async (sale: Omit<CashSale, 'id' | 'createdAt'>) => {
+    try {
+      await addCashSale(sale);
+      showToastMessage("Venta registrada exitosamente");
+      setShowCashSaleModal(false);
+    } catch (error) {
+      console.error(error);
+      showToastMessage("Error al registrar venta");
+    }
+  };
+
   const showToastMessage = (message: string) => {
     setToastMessage(message);
     setShowToast(true);
@@ -713,14 +732,6 @@ const AdminDashboard: React.FC = () => {
               >
                 <Calculator className="w-6 h-6 text-gray-600" />
               </button>
-              {/* Botón para cuentas corrientes */}
-              <button
-                onClick={() => navigate('/admin/cuentas')}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                title="Cuentas Corrientes"
-              >
-                <User className="w-6 h-6 text-gray-600" />
-              </button>
               {/* Botón para crear cartola de precios */}
               <button
                 onClick={() => setShowCartola(true)}
@@ -747,9 +758,43 @@ const AdminDashboard: React.FC = () => {
               </button>
             </div>
           </div>
+        </div>
+      </header>
+
+      {/* Main Content Area - Scrollable */}
+      <div className="pt-4 pb-2">
+        <div className="px-4">
+          {/* Dashboard Metrics */}
+          <div className="mb-6">
+            <DashboardMetrics />
+          </div>
+
+          {/* Quick Actions Buttons */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <button
+              onClick={() => setShowCashSaleModal(true)}
+              className="flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white p-4 rounded-xl shadow-md transition-all transform hover:scale-[1.02]"
+            >
+              <DollarSign className="w-6 h-6" />
+              <div className="text-left">
+                <div className="font-bold text-lg">Venta Contado</div>
+                <div className="text-green-100 text-sm">Registrar pago efe/transf</div>
+              </div>
+            </button>
+            <button
+              onClick={() => navigate('/admin/cuentas')}
+              className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl shadow-md transition-all transform hover:scale-[1.02]"
+            >
+              <CreditCard className="w-6 h-6" />
+              <div className="text-left">
+                <div className="font-bold text-lg">Venta Cta. Cte.</div>
+                <div className="text-blue-100 text-sm">Administrar cuotas/créditos</div>
+              </div>
+            </button>
+          </div>
 
           {/* Search Bar */}
-          <div className="relative">
+          <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
@@ -758,7 +803,7 @@ const AdminDashboard: React.FC = () => {
               placeholder="Buscar por código, nombre, marca..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
               autoComplete="off"
             />
             {/* Indicador de modo offline en el search bar */}
@@ -772,11 +817,11 @@ const AdminDashboard: React.FC = () => {
             )}
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Filter Chips */}
-      <div className="px-4 py-3 bg-white border-b border-gray-100">
-        <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="px-4 py-3 bg-white border-b border-gray-100 sticky top-[73px] z-30 shadow-sm">
+        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
           {filterChips.map((chip) => {
             const IconComponent = chip.icon;
             const isActive = activeFilter === chip.id;
@@ -801,291 +846,295 @@ const AdminDashboard: React.FC = () => {
       {/* Products Table */}
       <main className="pb-8">
         {/* Loading indicator */}
-        {offlineLoading && (
-          <div className="flex justify-center items-center py-8">
-            <div className="flex items-center gap-3 text-blue-600">
-              <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-              </svg>
-              <span>Cargando datos...</span>
-            </div>
-          </div>
-        )}
-
-        {filteredProducts.length === 0 && !offlineLoading ? (
-          <div className="text-center py-12 px-4">
-            <div className="text-gray-400 mb-4">
-              <Search className="w-12 h-12 mx-auto" />
-            </div>
-            <p className="text-gray-500 text-lg">No se encontraron productos</p>
-            <p className="text-gray-400 text-sm mt-2">
-              Intenta con otros términos de búsqueda
-            </p>
-            {!isOnline && (
-              <div className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
-                <p className="text-orange-700 text-sm">
-                  <strong>Modo offline:</strong> Solo se muestran productos guardados localmente
-                </p>
+        {
+          offlineLoading && (
+            <div className="flex justify-center items-center py-8">
+              <div className="flex items-center gap-3 text-blue-600">
+                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+                <span>Cargando datos...</span>
               </div>
-            )}
-          </div>
-        ) : (
-          <>
-            {/* Desktop Table */}
-            <div className="hidden xl:block">
-              <div className="bg-white mx-4 rounded-2xl shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                      <tr>
-                        <th className="text-left py-4 px-6 text-sm font-semibold text-gray-900 min-w-[200px]">
-                          Producto
-                        </th>
-                        <th className="text-left py-4 px-4 text-sm font-semibold text-gray-900">
-                          Código
-                        </th>
-                        <th className="text-center py-4 px-4 text-sm font-semibold text-gray-900">
-                          Stock
-                        </th>
-                        <th className="text-left py-4 px-4 text-sm font-semibold text-gray-900">
-                          Tipo
-                        </th>
-                        <th className="text-left py-4 px-4 text-sm font-semibold text-gray-900">
-                          Medidas
-                        </th>
-                        <th className="text-left py-4 px-4 text-sm font-semibold text-gray-900">
-                          Marca
-                        </th>
-                        <th className="text-right py-4 px-4 text-sm font-semibold text-gray-900">
-                          Precio Contado
-                        </th>
-                        <th className="text-right py-4 px-4 text-sm font-semibold text-gray-900">
-                          Precio Tarjeta
-                        </th>
-                        <th className="text-center py-4 px-4 text-sm font-semibold text-gray-900">
-                          Acción
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {filteredProducts.map((product) => (
-                        <tr
-                          key={product.id}
-                          className="hover:bg-gray-50 transition-colors"
-                        >
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                <ProductImage
-                                  src={product.image}
-                                  alt={product.nombre}
-                                  tipo={product.tipo}
-                                  className="w-full h-full"
-                                  size="small"
-                                />
-                              </div>
-                              <div className="min-w-0">
-                                <h3 className="font-medium text-gray-900 truncate">
-                                  {product.nombre}
-                                </h3>
-                                <p className="text-sm text-gray-500 truncate">
-                                  {product.subtipo}
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-4 px-4 text-sm text-gray-900 font-mono">
-                            {product.codigo}
-                          </td>
-                          <td className="py-4 px-4 text-center text-sm text-gray-900">
-                            {product.stock !== undefined ? product.stock : 0}
-                          </td>
-                          <td className="py-4 px-4">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              {product.tipo}
-                            </span>
-                          </td>
-                          <td className="py-4 px-4 text-sm text-gray-900">
-                            {product.medidas}
-                          </td>
-                          <td className="py-4 px-4 text-sm text-gray-900">
-                            {product.marca}
-                          </td>
-                          <td className="py-4 px-4 text-right text-sm font-semibold text-green-600">
-                            ${formatPrice(product.precioContado)}
-                          </td>
-                          <td className="py-4 px-4 text-right text-sm font-semibold text-blue-600">
-                            ${formatPrice(product.precioTarjeta)}
-                          </td>
-                          <td className="py-4 px-4 text-center">
-                            <button
-                              onClick={() => handleViewProduct(product)}
-                              className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                            >
-                              Ver
-                            </button>
-                          </td>
+            </div>
+          )
+        }
+
+        {
+          filteredProducts.length === 0 && !offlineLoading ? (
+            <div className="text-center py-12 px-4">
+              <div className="text-gray-400 mb-4">
+                <Search className="w-12 h-12 mx-auto" />
+              </div>
+              <p className="text-gray-500 text-lg">No se encontraron productos</p>
+              <p className="text-gray-400 text-sm mt-2">
+                Intenta con otros términos de búsqueda
+              </p>
+              {!isOnline && (
+                <div className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                  <p className="text-orange-700 text-sm">
+                    <strong>Modo offline:</strong> Solo se muestran productos guardados localmente
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* Desktop Table */}
+              <div className="hidden xl:block">
+                <div className="bg-white mx-4 rounded-2xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="text-left py-4 px-6 text-sm font-semibold text-gray-900 min-w-[200px]">
+                            Producto
+                          </th>
+                          <th className="text-left py-4 px-4 text-sm font-semibold text-gray-900">
+                            Código
+                          </th>
+                          <th className="text-center py-4 px-4 text-sm font-semibold text-gray-900">
+                            Stock
+                          </th>
+                          <th className="text-left py-4 px-4 text-sm font-semibold text-gray-900">
+                            Tipo
+                          </th>
+                          <th className="text-left py-4 px-4 text-sm font-semibold text-gray-900">
+                            Medidas
+                          </th>
+                          <th className="text-left py-4 px-4 text-sm font-semibold text-gray-900">
+                            Marca
+                          </th>
+                          <th className="text-right py-4 px-4 text-sm font-semibold text-gray-900">
+                            Precio Contado
+                          </th>
+                          <th className="text-right py-4 px-4 text-sm font-semibold text-gray-900">
+                            Precio Tarjeta
+                          </th>
+                          <th className="text-center py-4 px-4 text-sm font-semibold text-gray-900">
+                            Acción
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {filteredProducts.map((product) => (
+                          <tr
+                            key={product.id}
+                            className="hover:bg-gray-50 transition-colors"
+                          >
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                  <ProductImage
+                                    src={product.image}
+                                    alt={product.nombre}
+                                    tipo={product.tipo}
+                                    className="w-full h-full"
+                                    size="small"
+                                  />
+                                </div>
+                                <div className="min-w-0">
+                                  <h3 className="font-medium text-gray-900 truncate">
+                                    {product.nombre}
+                                  </h3>
+                                  <p className="text-sm text-gray-500 truncate">
+                                    {product.subtipo}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 px-4 text-sm text-gray-900 font-mono">
+                              {product.codigo}
+                            </td>
+                            <td className="py-4 px-4 text-center text-sm text-gray-900">
+                              {product.stock !== undefined ? product.stock : 0}
+                            </td>
+                            <td className="py-4 px-4">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {product.tipo}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4 text-sm text-gray-900">
+                              {product.medidas}
+                            </td>
+                            <td className="py-4 px-4 text-sm text-gray-900">
+                              {product.marca}
+                            </td>
+                            <td className="py-4 px-4 text-right text-sm font-semibold text-green-600">
+                              ${formatPrice(product.precioContado)}
+                            </td>
+                            <td className="py-4 px-4 text-right text-sm font-semibold text-blue-600">
+                              ${formatPrice(product.precioTarjeta)}
+                            </td>
+                            <td className="py-4 px-4 text-center">
+                              <button
+                                onClick={() => handleViewProduct(product)}
+                                className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                              >
+                                Ver
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Tablet List */}
-            <div className="hidden lg:block xl:hidden px-4 space-y-2">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer"
-                  onClick={() => handleViewProduct(product)}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      <ProductImage
-                        src={product.image}
-                        alt={product.nombre}
-                        tipo={product.tipo}
-                        className="w-full h-full"
-                        size="medium"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">
-                            {product.nombre}
-                          </h3>
-                          <p className="text-xs text-gray-500 truncate">
-                            {product.subtipo} • {product.marca}
-                          </p>
-                          <p className="text-xs text-gray-500 font-mono">
-                            {product.codigo}
-                          </p>
+              {/* Tablet List */}
+              <div className="hidden lg:block xl:hidden px-4 space-y-2">
+                {filteredProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                    onClick={() => handleViewProduct(product)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        <ProductImage
+                          src={product.image}
+                          alt={product.nombre}
+                          tipo={product.tipo}
+                          className="w-full h-full"
+                          size="medium"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">
+                              {product.nombre}
+                            </h3>
+                            <p className="text-xs text-gray-500 truncate">
+                              {product.subtipo} • {product.marca}
+                            </p>
+                            <p className="text-xs text-gray-500 font-mono">
+                              {product.codigo}
+                            </p>
+                          </div>
+                          <div className="text-right ml-4 flex-shrink-0">
+                            <p className="text-green-600 font-bold text-sm">
+                              ${formatPrice(product.precioContado)}
+                            </p>
+                            <p className="text-xs text-blue-600">
+                              ${formatPrice(product.precioTarjeta)}
+                            </p>
+                          </div>
                         </div>
-                        <div className="text-right ml-4 flex-shrink-0">
-                          <p className="text-green-600 font-bold text-sm">
-                            ${formatPrice(product.precioContado)}
-                          </p>
-                          <p className="text-xs text-blue-600">
-                            ${formatPrice(product.precioTarjeta)}
-                          </p>
+                        <div className="flex justify-between items-center mt-2">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {product.tipo}
+                            </span>
+                            <span className="text-xs text-gray-500 truncate">
+                              {product.medidas}
+                            </span>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewProduct(product);
+                            }}
+                            className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors"
+                          >
+                            Ver
+                          </button>
                         </div>
                       </div>
-                      <div className="flex justify-between items-center mt-2">
-                        <div className="flex items-center gap-2">
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Mobile Cards */}
+              <div className="lg:hidden px-4 space-y-3">
+                {filteredProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                    onClick={() => handleViewProduct(product)}
+                  >
+                    <div className="flex gap-3">
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        <ProductImage
+                          src={product.image}
+                          alt={product.nombre}
+                          tipo={product.tipo}
+                          className="w-full h-full"
+                          size="medium"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-gray-900 text-sm leading-tight">
+                              {product.nombre}
+                            </h3>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {product.subtipo}
+                            </p>
+                          </div>
+                          <div className="text-right ml-2 flex-shrink-0">
+                            <p className="text-green-600 font-bold text-sm">
+                              ${formatPrice(product.precioContado)}
+                            </p>
+                            <p className="text-xs text-blue-600">
+                              ${formatPrice(product.precioTarjeta)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-gray-500">Código:</span>
+                            <span className="ml-1 font-mono font-medium">
+                              {product.codigo}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Marca:</span>
+                            <span className="ml-1 font-medium">
+                              {product.marca}
+                            </span>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="text-gray-500">Medidas:</span>
+                            <span className="ml-1 font-medium">
+                              {product.medidas}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center mt-3">
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                             {product.tipo}
                           </span>
-                          <span className="text-xs text-gray-500 truncate">
-                            {product.medidas}
-                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewProduct(product);
+                            }}
+                            className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors"
+                          >
+                            Ver Detalles
+                          </button>
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewProduct(product);
-                          }}
-                          className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors"
-                        >
-                          Ver
-                        </button>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Mobile Cards */}
-            <div className="lg:hidden px-4 space-y-3">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer"
-                  onClick={() => handleViewProduct(product)}
-                >
-                  <div className="flex gap-3">
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      <ProductImage
-                        src={product.image}
-                        alt={product.nombre}
-                        tipo={product.tipo}
-                        className="w-full h-full"
-                        size="medium"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-sm leading-tight">
-                            {product.nombre}
-                          </h3>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {product.subtipo}
-                          </p>
-                        </div>
-                        <div className="text-right ml-2 flex-shrink-0">
-                          <p className="text-green-600 font-bold text-sm">
-                            ${formatPrice(product.precioContado)}
-                          </p>
-                          <p className="text-xs text-blue-600">
-                            ${formatPrice(product.precioTarjeta)}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <span className="text-gray-500">Código:</span>
-                          <span className="ml-1 font-mono font-medium">
-                            {product.codigo}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Marca:</span>
-                          <span className="ml-1 font-medium">
-                            {product.marca}
-                          </span>
-                        </div>
-                        <div className="col-span-2">
-                          <span className="text-gray-500">Medidas:</span>
-                          <span className="ml-1 font-medium">
-                            {product.medidas}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center mt-3">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {product.tipo}
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewProduct(product);
-                          }}
-                          className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors"
-                        >
-                          Ver Detalles
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </main>
+                ))}
+              </div>
+            </>
+          )
+        }
+      </main >
 
       {/* Toast Notification */}
-      <Toast />
+      < Toast />
 
       {/* Settings Modal */}
-      <SettingsModal
+      < SettingsModal
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
         currentUser={currentUser}
@@ -1106,7 +1155,7 @@ const AdminDashboard: React.FC = () => {
       />
 
       {/* Calculator Modal */}
-      <PaymentCalculatorModal
+      < PaymentCalculatorModal
         isOpen={showCalculator}
         onClose={() => {
           setShowCalculator(false);
@@ -1116,26 +1165,30 @@ const AdminDashboard: React.FC = () => {
       />
 
       {/* Cartola de precios Modal */}
-      <CartolaModal
+      < CartolaModal
         open={showCartola}
-        onClose={() => {
-          setShowCartola(false);
-          setCartolaPreloadData(undefined);
-        }}
+        onClose={() => setShowCartola(false)}
         preloadData={cartolaPreloadData}
       />
 
+      <CashSaleModal
+        isOpen={showCashSaleModal}
+        onClose={() => setShowCashSaleModal(false)}
+        onSave={handleSaveCashSale}
+      />
       {/* Product Detail Modal */}
-      {selectedProduct && (
-        <ProductDetailModal
-          product={selectedProduct}
-          storeData={storeData}
-          onClose={handleCloseProductDetail}
-          onOpenCalculator={handleOpenCalculator}
-          onCreateCartola={handleCreateCartolaFromProduct}
-        />
-      )}
-    </div>
+      {
+        selectedProduct && (
+          <ProductDetailModal
+            product={selectedProduct}
+            storeData={storeData}
+            onClose={handleCloseProductDetail}
+            onOpenCalculator={handleOpenCalculator}
+            onCreateCartola={handleCreateCartolaFromProduct}
+          />
+        )
+      }
+    </div >
   );
 };
 
