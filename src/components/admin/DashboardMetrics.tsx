@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePersonalAccounts } from '../../hooks/usePersonalAccounts';
 import { useCashSales } from '../../hooks/useCashSales';
 import { DollarSign, Calendar, AlertCircle, TrendingUp } from 'lucide-react';
@@ -11,9 +12,11 @@ interface MetricCardProps {
     icon: React.ComponentType<{ className?: string }>;
     color: 'blue' | 'green' | 'red' | 'indigo';
     loading?: boolean;
+    onClick?: () => void;
+    className?: string;
 }
 
-const MetricCard: React.FC<MetricCardProps> = ({ title, value, subtitle, icon: Icon, color, loading }) => {
+const MetricCard: React.FC<MetricCardProps> = ({ title, value, subtitle, icon: Icon, color, loading, onClick, className }) => {
     const colorClasses = {
         blue: 'bg-blue-50 text-blue-600',
         green: 'bg-green-50 text-green-600',
@@ -22,7 +25,10 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, subtitle, icon: I
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between h-full transition-transform hover:scale-[1.02] duration-200">
+        <div
+            onClick={onClick}
+            className={`bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between h-full transition-all duration-200 ${className || ''} ${onClick ? 'hover:scale-[1.02]' : ''}`}
+        >
             <div className="flex justify-between items-start mb-4">
                 <div className={`p-3 rounded-xl ${colorClasses[color]}`}>
                     <Icon className="w-6 h-6" />
@@ -131,6 +137,8 @@ export const DashboardMetrics: React.FC = () => {
         }).format(val);
     };
 
+    const navigate = useNavigate();
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 px-4">
             <MetricCard
@@ -140,6 +148,8 @@ export const DashboardMetrics: React.FC = () => {
                 icon={DollarSign}
                 color="blue"
                 loading={loading}
+                onClick={() => navigate('/admin/ventas')}
+                className="cursor-pointer hover:ring-2 hover:ring-blue-200"
             />
             <MetricCard
                 title="Pendiente de Cobro"

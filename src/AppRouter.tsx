@@ -16,6 +16,7 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import AdminLogin from './pages/AdminLogin';
 import NotFoundPage from './pages/NotFoundPage';
 import PersonalAccountsPage from './pages/PersonalAccountsPage';
+import SalesHistoryPage from './pages/SalesHistoryPage';
 
 const AppRouter: React.FC = () => {
   return (
@@ -46,6 +47,14 @@ const AppRouter: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <PersonalAccountsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/ventas"
+                element={
+                  <ProtectedRoute>
+                    <SalesHistoryPage />
                   </ProtectedRoute>
                 }
               />

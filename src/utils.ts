@@ -27,6 +27,45 @@ export const formatCurrency = (value: number): string => {
 };
 
 /**
+ * Parsea un string de moneda (ej: "$ 1.234,56") a número.
+ * Maneja formatos AR (punto miles, coma decimal) y US (coma miles, punto decimal).
+ */
+export const parseCurrencyString = (value: string | number | undefined | null): number => {
+  if (value === undefined || value === null) return 0;
+  if (typeof value === 'number') return value;
+
+  // Remove currency symbol and spaces
+  let clean = value.replace(/[$\s]/g, '');
+  if (!clean) return 0;
+
+  // Check format heuristics
+  if (clean.includes(',') && clean.includes('.')) {
+    const lastDot = clean.lastIndexOf('.');
+    const lastComma = clean.lastIndexOf(',');
+    if (lastComma > lastDot) {
+      // AR/EU format: 1.234,56 -> remove dots, replace comma with dot
+      clean = clean.replace(/\./g, '').replace(',', '.');
+    } else {
+      // US format: 1,234.56 -> remove commas
+      clean = clean.replace(/,/g, '');
+    }
+  } else if (clean.includes(',')) {
+    // Ambiguous, assume AR format (comma is decimal) usually
+    // But check if it looks like thousands (e.g. 1,000) vs decimal (123,45)
+    // For safety in this context, we'll replace comma with dot since we expect decimals
+    clean = clean.replace(',', '.');
+  }
+  // else if only dots, unlikely in price unless it's just thousands 1.000 -> 1000
+  // or small number 1.5 -> 1.5. JS parseFloat handles 1.5. 
+  // But 1.000 (one thousand) parses as 1.0. 
+  // Let's assume strict format: if only dots and multiple or near end, remove them.
+  // Actually, standard parseFloat is safer for simple dot decimals.
+
+  const num = parseFloat(clean);
+  return isNaN(num) ? 0 : num;
+};
+
+/**
  * Genera un nombre de archivo único basado en el título y fecha actual
  */
 export const generateFileName = (baseName: string, extension: string = 'png'): string => {
@@ -113,7 +152,7 @@ export const saveUsers = (users: Record<string, User>): void => {
  */
 export const registerUser = (username: string, password: string, businessName: string): User => {
   const users = getUsers();
-  
+
   if (users[username]) {
     throw new Error('El usuario ya existe');
   }
@@ -127,7 +166,7 @@ export const registerUser = (username: string, password: string, businessName: s
 
   users[username] = newUser;
   saveUsers(users);
-  
+
   return newUser;
 };
 
@@ -137,11 +176,11 @@ export const registerUser = (username: string, password: string, businessName: s
 export const authenticateUser = (username: string, password: string): User | null => {
   const users = getUsers();
   const user = users[username];
-  
+
   if (user && user.password === password) {
     return user;
   }
-  
+
   return null;
 };
 
@@ -181,8 +220,8 @@ export const generateProductId = (existingProducts: Product[]): number => {
  * Filtra productos basado en criterios de búsqueda
  */
 export const filterProducts = (
-  products: Product[], 
-  searchQuery: string, 
+  products: Product[],
+  searchQuery: string,
   activeFilter: string
 ): Product[] => {
   let filtered = products;
@@ -190,13 +229,13 @@ export const filterProducts = (
   // Filtrar por tipo
   if (activeFilter !== "TODOS") {
     if (activeFilter === "RESORTES") {
-      filtered = filtered.filter(p => 
-        (p.tipo === 'COLCHONES' || p.tipo === 'SOMMIERS') && 
+      filtered = filtered.filter(p =>
+        (p.tipo === 'COLCHONES' || p.tipo === 'SOMMIERS') &&
         p.subtipo.toLowerCase().includes("resortes")
       );
     } else if (activeFilter === "ESPUMA") {
-      filtered = filtered.filter(p => 
-        (p.tipo === 'COLCHONES' || p.tipo === 'SOMMIERS') && 
+      filtered = filtered.filter(p =>
+        (p.tipo === 'COLCHONES' || p.tipo === 'SOMMIERS') &&
         p.subtipo.toLowerCase().includes("espuma")
       );
     } else {
@@ -227,8 +266,8 @@ export const filterProducts = (
  * Exporta datos de la aplicación como archivo JSON
  */
 export const exportAppData = (
-  products: Product[], 
-  storeData: StoreData, 
+  products: Product[],
+  storeData: StoreData,
   username: string
 ): void => {
   const data: ExportData = {
@@ -241,7 +280,7 @@ export const exportAppData = (
   const blob = new Blob([JSON.stringify(data, null, 2)], {
     type: "application/json",
   });
-  
+
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -256,7 +295,7 @@ export const exportAppData = (
 export const processImportFile = (file: File): Promise<Partial<ExportData>> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
       try {
         const data = JSON.parse(e.target?.result as string);
@@ -265,11 +304,11 @@ export const processImportFile = (file: File): Promise<Partial<ExportData>> => {
         reject(new Error('Error al procesar el archivo. Verifica que sea un archivo JSON válido.'));
       }
     };
-    
+
     reader.onerror = () => {
       reject(new Error('Error al leer el archivo.'));
     };
-    
+
     reader.readAsText(file);
   });
 };
@@ -302,12 +341,12 @@ export const SOMMIER_MAPPING: Record<string, string[]> = {
 export const processPriceListCSV = (csvContent: string): Record<string, number> => {
   const lines = csvContent.split(/\r?\n/).filter(ln => ln.trim());
   const priceMap: Record<string, number> = {};
-  
+
   lines.forEach(line => {
     const cols = line.split(",");
     const codeRaw = cols[0]?.trim();
     const priceStr = cols[3]?.trim();
-    
+
     // Solo procesamos códigos numéricos, ignorando filas vacías o de encabezado
     if (codeRaw && !isNaN(Number(codeRaw)) && priceStr && !isNaN(parseFloat(priceStr))) {
       // Normalizar el código: convertir a entero para eliminar decimales y luego a string
@@ -315,7 +354,7 @@ export const processPriceListCSV = (csvContent: string): Record<string, number> 
       priceMap[normalizedCode] = parseFloat(priceStr);
     }
   });
-  
+
   return priceMap;
 };
 
@@ -323,13 +362,13 @@ export const processPriceListCSV = (csvContent: string): Record<string, number> 
  * Actualiza los precios de una lista de productos basado en un mapa de precios
  */
 export const updateProductPrices = (
-  products: Product[], 
+  products: Product[],
   priceMap: Record<string, number>
 ): Product[] => {
   // Primero actualizar productos individuales (no sommier)
   let updated = products.map(p => {
     if (p.tipo === "SOMMIERS") return p;
-    
+
     const newPrice = priceMap[p.codigo];
     if (newPrice != null) {
       // El precio al público es el doble del precio mayorista
@@ -337,17 +376,17 @@ export const updateProductPrices = (
       const newTarjeta = Math.round((contadoPublic * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
       return { ...p, precioContado: contadoPublic, precioTarjeta: newTarjeta };
     }
-    
+
     return p;
   });
-  
+
   // Luego actualizar cada sommier sumando los componentes
   updated = updated.map(p => {
     if (p.tipo !== "SOMMIERS") return p;
-    
+
     const combo = SOMMIER_MAPPING[p.codigo];
     if (!combo) return p;
-    
+
     let sum = 0;
     combo.forEach(code => {
       const item = updated.find(it => it.codigo === code);
@@ -355,13 +394,13 @@ export const updateProductPrices = (
         sum += item.precioContado;
       }
     });
-    
+
     // Precio contado y tarjeta calculados en base a los precios al público de los componentes
     sum = Math.round((sum + Number.EPSILON) * 100) / 100;
     const newTarjeta = Math.round((sum * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
     return { ...p, precioContado: sum, precioTarjeta: newTarjeta };
   });
-  
+
   return updated;
 };
 
@@ -371,7 +410,7 @@ export const updateProductPrices = (
 export const importPriceListFromFile = (file: File): Promise<Product[]> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
       try {
         const csvContent = e.target?.result as string;
@@ -383,11 +422,11 @@ export const importPriceListFromFile = (file: File): Promise<Product[]> => {
         reject(new Error('Error al procesar el archivo CSV'));
       }
     };
-    
+
     reader.onerror = () => {
       reject(new Error('Error al leer el archivo'));
     };
-    
+
     reader.readAsText(file);
   });
 };
@@ -401,31 +440,31 @@ export const importPriceListFromFile = (file: File): Promise<Product[]> => {
  */
 export const validateProduct = (product: Omit<Product, 'id'>): string[] => {
   const errors: string[] = [];
-  
+
   if (!product.codigo.trim()) {
     errors.push('El código es requerido');
   }
-  
+
   if (!product.nombre.trim()) {
     errors.push('El nombre es requerido');
   }
-  
+
   if (!product.marca.trim()) {
     errors.push('La marca es requerida');
   }
-  
+
   if (!product.medidas.trim()) {
     errors.push('Las medidas son requeridas');
   }
-  
+
   if (product.precioContado <= 0) {
     errors.push('El precio de contado debe ser mayor a 0');
   }
-  
+
   if (product.precioTarjeta <= 0) {
     errors.push('El precio de tarjeta debe ser mayor a 0');
   }
-  
+
   return errors;
 };
 
@@ -434,29 +473,29 @@ export const validateProduct = (product: Omit<Product, 'id'>): string[] => {
  */
 export const validateStoreData = (storeData: StoreData): string[] => {
   const errors: string[] = [];
-  
+
   if (!storeData.name.trim()) {
     errors.push('El nombre de la tienda es requerido');
   }
-  
+
   if (!storeData.location.trim()) {
     errors.push('La ubicación es requerida');
   }
-  
+
   if (!storeData.phone.trim()) {
     errors.push('El teléfono es requerido');
   }
-  
+
   if (!storeData.email.trim()) {
     errors.push('El email es requerido');
   } else if (!/\S+@\S+\.\S+/.test(storeData.email)) {
     errors.push('El email no tiene un formato válido');
   }
-  
+
   if (!storeData.hours.trim()) {
     errors.push('Los horarios son requeridos');
   }
-  
+
   return errors;
 };
 
@@ -464,30 +503,30 @@ export const validateStoreData = (storeData: StoreData): string[] => {
  * Valida los datos de registro de usuario
  */
 export const validateUserRegistration = (
-  username: string, 
-  password: string, 
+  username: string,
+  password: string,
   businessName: string
 ): string[] => {
   const errors: string[] = [];
-  
+
   if (!username.trim()) {
     errors.push('El usuario es requerido');
   } else if (username.length < 3) {
     errors.push('El usuario debe tener al menos 3 caracteres');
   }
-  
+
   if (!password.trim()) {
     errors.push('La contraseña es requerida');
   } else if (password.length < 4) {
     errors.push('La contraseña debe tener al menos 4 caracteres');
   }
-  
+
   if (!businessName.trim()) {
     errors.push('El nombre del negocio es requerido');
   } else if (businessName.length < 3) {
     errors.push('El nombre del negocio debe tener al menos 3 caracteres');
   }
-  
+
   return errors;
 };
 
@@ -510,7 +549,7 @@ export const debounce = <T extends (...args: any[]) => any>(
   wait: number
 ): (...args: Parameters<T>) => void => {
   let timeout: NodeJS.Timeout;
-  
+
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
