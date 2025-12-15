@@ -8,7 +8,8 @@ import {
   Calculator,
   FilePlus,
   DollarSign,
-  CreditCard
+  CreditCard,
+  Package
 } from "lucide-react";
 
 // Importamos los componentes y datos refactorizados
@@ -35,6 +36,7 @@ import CartolaModal from "./CartolaModal";
 import ConnectionIndicator from "./ConnectionIndicator";
 import { useOffline } from "./useOffline";
 import { productToCartolaData, getCartolaStyleByProductType } from "./cartolaIntegration";
+import { StockManagementModal } from "./components/admin/StockManagementModal";
 import { ProductImage } from "./ProductImage";
 import { useAuth } from './contexts/AuthContext';
 import { convertXmlToCsv } from './xmlToCsvConverter';
@@ -78,6 +80,7 @@ const AdminDashboard: React.FC = () => {
   const [showCalculator, setShowCalculator] = useState(false);
   const [showCartola, setShowCartola] = useState(false);
   const [showCashSaleModal, setShowCashSaleModal] = useState(false);
+  const [showStockManagement, setShowStockManagement] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -724,6 +727,14 @@ const AdminDashboard: React.FC = () => {
               <ConnectionIndicator className="ml-4" />
             </div>
             <div className="flex items-center gap-2">
+              {/* Botón de Gestión de Stock */}
+              <button
+                onClick={() => setShowStockManagement(true)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                title="Gestión de Stock"
+              >
+                <Package className="w-6 h-6 text-gray-600" />
+              </button>
               {/* Botón de calculadora para abrir el modal de cuotas */}
               <button
                 onClick={() => handleOpenCalculator()}
@@ -1188,6 +1199,12 @@ const AdminDashboard: React.FC = () => {
           />
         )
       }
+      <StockManagementModal
+        isOpen={showStockManagement}
+        onClose={() => setShowStockManagement(false)}
+        products={products}
+        onUpdateProducts={updateProductsBatch}
+      />
     </div >
   );
 };

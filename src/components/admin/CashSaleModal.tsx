@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, DollarSign, FileText, Calendar } from 'lucide-react';
+import { X, DollarSign, FileText, Calendar, User, CreditCard, Banknote } from 'lucide-react';
 import { CashSale } from '../../types';
 
 interface CashSaleModalProps {
@@ -11,6 +11,8 @@ interface CashSaleModalProps {
 export const CashSaleModal: React.FC<CashSaleModalProps> = ({ isOpen, onClose, onSave }) => {
     const [amount, setAmount] = useState<number | ''>('');
     const [description, setDescription] = useState('');
+    const [clientName, setClientName] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Transferencia'>('Efectivo');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [loading, setLoading] = useState(false);
 
@@ -25,11 +27,15 @@ export const CashSaleModal: React.FC<CashSaleModalProps> = ({ isOpen, onClose, o
             await onSave({
                 amount: Number(amount),
                 description,
+                clientName,
+                paymentMethod,
                 date: new Date(date).toISOString(),
             });
             // Reset and close
             setAmount('');
             setDescription('');
+            setClientName('');
+            setPaymentMethod('Efectivo');
             setDate(new Date().toISOString().split('T')[0]);
             onClose();
         } catch (error) {
@@ -64,6 +70,50 @@ export const CashSaleModal: React.FC<CashSaleModalProps> = ({ isOpen, onClose, o
                                 placeholder="0.00"
                                 value={amount}
                                 onChange={(e) => setAmount(parseFloat(e.target.value))}
+                            />
+                        </div>
+                    </div>
+
+
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Medio de Pago</label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setPaymentMethod('Efectivo')}
+                                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border transition-all ${paymentMethod === 'Efectivo'
+                                    ? 'bg-green-50 border-green-200 text-green-700 ring-2 ring-green-500 ring-opacity-50'
+                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                    }`}
+                            >
+                                <Banknote className="w-5 h-5" />
+                                <span className="font-medium">Efectivo</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setPaymentMethod('Transferencia')}
+                                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border transition-all ${paymentMethod === 'Transferencia'
+                                    ? 'bg-blue-50 border-blue-200 text-blue-700 ring-2 ring-blue-500 ring-opacity-50'
+                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                    }`}
+                            >
+                                <CreditCard className="w-5 h-5" />
+                                <span className="font-medium">Transferencia</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Cliente (Opcional)</label>
+                        <div className="relative">
+                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <input
+                                type="text"
+                                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Nombre del cliente"
+                                value={clientName}
+                                onChange={(e) => setClientName(e.target.value)}
                             />
                         </div>
                     </div>
@@ -114,7 +164,7 @@ export const CashSaleModal: React.FC<CashSaleModalProps> = ({ isOpen, onClose, o
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };

@@ -12,6 +12,7 @@ export interface Product {
   image: string;
   marca: string;
   stock?: number;
+  minStock?: number;
   images?: string[];
 }
 
@@ -276,6 +277,8 @@ export interface CashSale {
   id?: string;
   amount: number;
   description: string;
+  clientName?: string;
+  paymentMethod?: 'Efectivo' | 'Transferencia';
   date: string; // ISO string
   createdAt: string;
 }
