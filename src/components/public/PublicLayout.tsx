@@ -26,7 +26,7 @@ const PublicLayout: React.FC = () => {
             <Link to="/" className="flex items-center space-x-2">
               <Bed className="w-8 h-8 text-primary" />
               <span className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                {storeData.name || "La Casa de los Colchones"}
+                {storeData.name}
               </span>
             </Link>
 
@@ -136,7 +136,7 @@ const PublicLayout: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Bed className="w-6 h-6 text-primary" />
-                <span className="text-xl font-bold">{storeData.name || "La Casa de los Colchones"}</span>
+                <span className="text-xl font-bold">{storeData.name}</span>
               </div>
               <p className="text-gray-400 text-sm">
                 Tu tienda de confianza para el mejor descanso.
@@ -171,15 +171,15 @@ const PublicLayout: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex items-center space-x-2 text-gray-400 text-sm">
                   <Phone className="w-4 h-4" />
-                  <span>{storeData.phone || "+54 11 1234-5678"}</span>
+                  <span>{storeData.phone}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-gray-400 text-sm">
                   <Mail className="w-4 h-4" />
-                  <span>{storeData.email || "info@casacolchones.com"}</span>
+                  <span>{storeData.email}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-gray-400 text-sm">
                   <MapPin className="w-4 h-4" />
-                  <span>{storeData.location || "Buenos Aires, Argentina"}</span>
+                  <span>{storeData.location}</span>
                 </div>
               </div>
             </div>
@@ -191,7 +191,7 @@ const PublicLayout: React.FC = () => {
                 <div className="flex items-center space-x-2 text-gray-400 text-sm">
                   <Clock className="w-4 h-4" />
                   <div>
-                    <div>{storeData.hours || "Lun - Vie: 9:00 - 18:00"}</div>
+                    <div>{storeData.hours}</div>
                   </div>
                 </div>
               </div>
