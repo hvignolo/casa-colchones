@@ -39,7 +39,8 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSubmit, 
             isDelivered: false,
             startDate: new Date().toISOString().split('T')[0],
             status: 'active',
-            notes: ''
+            notes: '',
+            amount: 0
         }
     );
 
@@ -58,7 +59,8 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSubmit, 
                 isDelivered: false,
                 startDate: new Date().toISOString().split('T')[0],
                 status: 'active',
-                notes: ''
+                notes: '',
+                amount: 0
             });
         }
     }, [isOpen, initialData]);
@@ -74,6 +76,16 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSubmit, 
             // Validate required fields
             if (!formData.customerName || !formData.productDetails || !formData.amountPerInstallment) {
                 alert('Por favor complete los campos obligatorios');
+                return;
+            }
+
+            // Validate total amount
+            const calculatedTotal = (formData.initialPayment || 0) + (formData.totalInstallments || 0) * (formData.amountPerInstallment || 0);
+            const inputTotal = formData.amount || 0;
+
+            // Allow a small margin of error for floating point calculations, though with currency it should be exact usually
+            if (Math.abs(calculatedTotal - inputTotal) > 0.1) {
+                alert(`Error de validación:\n\nEl Total Venta ($${inputTotal})\nNO COINCIDE con la suma de:\nEntrega Inicial ($${formData.initialPayment || 0}) + Cuotas ($${calculatedTotal - (formData.initialPayment || 0)})\n\nSuma calculada: $${calculatedTotal}`);
                 return;
             }
 
@@ -163,6 +175,20 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSubmit, 
                                 onChange={e => setFormData({ ...formData, productDetails: e.target.value })}
                                 placeholder="Ej: Sommier King Size + 2 Almohadas"
                                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Total Venta ($) *</label>
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                required
+                                value={formData.amount}
+                                onChange={e => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
+                                placeholder="Monto total de la operación"
+                                className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 border-blue-200 bg-blue-50 font-bold"
                             />
                         </div>
 
@@ -429,7 +455,7 @@ const PersonalAccountsPage: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredAccounts.map((account: PersonalAccount) => (
                             <div key={account.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow relative group">
-                                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute top-14 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                     <button
                                         onClick={() => handleEdit(account)}
                                         className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -446,17 +472,24 @@ const PersonalAccountsPage: React.FC = () => {
                                     </button>
                                 </div>
 
-                                <div className="flex justify-between items-start mb-4 pr-16">
+                                <div className="flex justify-between items-start mb-4">
                                     <div>
                                         <h3 className="text-lg font-bold text-gray-900">{account.customerName}</h3>
-                                        <p className="text-sm text-gray-500">{account.productDetails}</p>
+                                        <p className="text-sm text-gray-500 whitespace-pre-wrap mt-1">{account.productDetails}</p>
                                     </div>
-                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[account.status]}`}>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ml-2 ${statusColors[account.status]}`}>
                                         {statusLabels[account.status]}
                                     </span>
                                 </div>
 
                                 <div className="space-y-3 mb-6">
+                                    {account.amount && (
+                                        <div className="flex items-center gap-2 text-sm text-gray-900 bg-gray-50 p-2 rounded-lg mb-2 font-bold justify-between">
+                                            <span>Total Venta:</span>
+                                            <span className="text-blue-700">${account.amount.toLocaleString('es-AR')}</span>
+                                        </div>
+                                    )}
+
                                     <div className="flex items-center gap-2 text-sm text-gray-600">
                                         <DollarSign className="w-4 h-4 text-gray-400" />
                                         <span>
@@ -470,11 +503,16 @@ const PersonalAccountsPage: React.FC = () => {
                                         </span>
                                     </div>
                                     {/* Progress Bar */}
-                                    <div className="w-full bg-gray-100 rounded-full h-2">
-                                        <div
-                                            className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                                            style={{ width: `${(account.paidInstallments / account.totalInstallments) * 100}%` }}
-                                        ></div>
+                                    {/* Segmented Progress Bar */}
+                                    <div className="flex gap-1 w-full">
+                                        {Array.from({ length: account.totalInstallments }).map((_, index) => (
+                                            <div
+                                                key={index}
+                                                className={`h-2 flex-1 rounded-full transition-colors duration-300 ${index < account.paidInstallments ? 'bg-blue-600' : 'bg-gray-200'
+                                                    }`}
+                                                title={`Cuota ${index + 1}`}
+                                            />
+                                        ))}
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-600">
                                         <Calendar className="w-4 h-4 text-gray-400" />

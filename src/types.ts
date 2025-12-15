@@ -261,6 +261,7 @@ export interface PersonalAccount {
   totalInstallments: number;
   paidInstallments: number;
   amountPerInstallment: number;
+  amount: number; // Total Venta
   isDelivered: boolean;
   startDate: string; // ISO date string
   lastPaymentDate?: string; // ISO date string
