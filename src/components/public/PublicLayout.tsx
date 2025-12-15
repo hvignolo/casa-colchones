@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { Menu, X, Bed, Phone, User, Mail, MapPin, Clock } from 'lucide-react';
+import { useStore } from '../../contexts/StoreContext';
 
 const PublicLayout: React.FC = () => {
+  const { storeData } = useStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -24,7 +26,7 @@ const PublicLayout: React.FC = () => {
             <Link to="/" className="flex items-center space-x-2">
               <Bed className="w-8 h-8 text-primary" />
               <span className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                La Casa de los Colchones
+                {storeData.name || "La Casa de los Colchones"}
               </span>
             </Link>
 
@@ -134,7 +136,7 @@ const PublicLayout: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Bed className="w-6 h-6 text-primary" />
-                <span className="text-xl font-bold">La Casa de los Colchones</span>
+                <span className="text-xl font-bold">{storeData.name || "La Casa de los Colchones"}</span>
               </div>
               <p className="text-gray-400 text-sm">
                 Tu tienda de confianza para el mejor descanso.
@@ -169,15 +171,15 @@ const PublicLayout: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex items-center space-x-2 text-gray-400 text-sm">
                   <Phone className="w-4 h-4" />
-                  <span>+54 11 1234-5678</span>
+                  <span>{storeData.phone || "+54 11 1234-5678"}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-gray-400 text-sm">
                   <Mail className="w-4 h-4" />
-                  <span>info@casacolchones.com</span>
+                  <span>{storeData.email || "info@casacolchones.com"}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-gray-400 text-sm">
                   <MapPin className="w-4 h-4" />
-                  <span>Buenos Aires, Argentina</span>
+                  <span>{storeData.location || "Buenos Aires, Argentina"}</span>
                 </div>
               </div>
             </div>
@@ -189,9 +191,7 @@ const PublicLayout: React.FC = () => {
                 <div className="flex items-center space-x-2 text-gray-400 text-sm">
                   <Clock className="w-4 h-4" />
                   <div>
-                    <div>Lun - Vie: 9:00 - 18:00</div>
-                    <div>Sáb: 9:00 - 14:00</div>
-                    <div>Dom: Cerrado</div>
+                    <div>{storeData.hours || "Lun - Vie: 9:00 - 18:00"}</div>
                   </div>
                 </div>
               </div>

@@ -35,6 +35,7 @@ import { useAuth } from './contexts/AuthContext';
 import { convertXmlToCsv } from './xmlToCsvConverter';
 import { convertXlsToCsv } from './xlsToCsvConverter';
 import { useProducts } from './contexts/ProductContext';
+import { useStore } from './contexts/StoreContext';
 
 // Tipos para la integración
 interface CalculatorPreloadData {
@@ -89,8 +90,8 @@ const AdminDashboard: React.FC = () => {
     clearOldData
   } = useOffline();
 
-  // Datos de la tienda con persistencia offline
-  const [storeData, setStoreData] = useState<StoreData>(DEFAULT_STORE_DATA);
+  // Datos de la tienda con persistencia global (Firebase)
+  const { storeData, updateStoreData } = useStore();
 
   // Registrar Service Worker - Versión para producción y GitHub Pages
   useEffect(() => {
@@ -125,51 +126,17 @@ const AdminDashboard: React.FC = () => {
       if (!currentUser) return;
 
       try {
-        // Cargar datos de la tienda
-        const offlineStoreData = await loadStoreDataOffline(currentUser.username);
-        if (offlineStoreData) {
-          setStoreData(offlineStoreData);
-        } else {
-          // Si no hay datos offline, usar los datos por defecto con el nombre del negocio
-          const defaultStoreWithName = {
-            ...DEFAULT_STORE_DATA,
-            name: currentUser.businessName,
-          };
-          setStoreData(defaultStoreWithName);
-          await saveStoreDataOffline(defaultStoreWithName, currentUser.username);
-        }
-
         // Product loading is now handled by ProductContext
       } catch (error) {
         console.error('Error loading user data:', error);
-        // Fallback a localStorage
-        const fallbackStoreData = loadFromLocalStorage("storeData", {
-          ...DEFAULT_STORE_DATA,
-          name: currentUser.businessName,
-        });
-        setStoreData(fallbackStoreData);
       }
     };
 
     loadUserData();
-  }, [currentUser, loadStoreDataOffline, saveStoreDataOffline]); // Removed product dependencies
+  }, [currentUser]); // Removed product and store dependencies
 
-  // Guardar datos automáticamente offline (Store only)
-  useEffect(() => {
-    const saveData = async () => {
-      if (currentUser && storeData.name && !offlineLoading) {
-        try {
-          await saveStoreDataOffline(storeData, currentUser.username);
-          // También guardar en localStorage como fallback
-          saveToLocalStorage("storeData", storeData);
-        } catch (error) {
-          console.error('Error saving store data offline:', error);
-        }
-      }
-    };
+  // Removed store data offline saving as it is handled by Context
 
-    saveData();
-  }, [storeData, currentUser, saveStoreDataOffline, offlineLoading]);
 
   // Removed product saving effect as it's handled by Firestore
 
@@ -648,7 +615,7 @@ const AdminDashboard: React.FC = () => {
           await updateProductsBatch(data.products);
         }
         if (data.storeData) {
-          setStoreData(data.storeData);
+          await updateStoreData(data.storeData);
         }
 
         // Registrar acción offline si no hay conexión
@@ -677,7 +644,7 @@ const AdminDashboard: React.FC = () => {
 
       // Reset products to default in Firestore
       await updateProductsBatch(defaultProducts);
-      setStoreData(defaultStoreWithName);
+      await updateStoreData(defaultStoreWithName);
 
       // Registrar acción offline si no hay conexión
       if (!isOnline && currentUser) {
@@ -1124,7 +1091,7 @@ const AdminDashboard: React.FC = () => {
         currentUser={currentUser}
         storeData={storeData}
         products={products}
-        onUpdateStoreData={setStoreData}
+        onUpdateStoreData={updateStoreData}
         onSaveProduct={handleSaveProduct}
         onDeleteProduct={handleDeleteProduct}
         onEditProduct={() => { }} // No se usa en este flujo simplificado
