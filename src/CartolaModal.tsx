@@ -12,7 +12,16 @@ export type EstiloCartola =
   | 'geometric'
   | 'wellness'
   | 'sale'
+  | 'christmas'
   | 'delicate'
+  | 'christmas_classic'
+  | 'christmas_white'
+  | 'premium'
+  | 'fresh'
+  | 'modern_v2'
+  | 'impact'
+  | 'boho'
+  | 'grid'
 
 // Mapa de etiquetas visibles para cada estilo
 const ETIQUETAS_ESTILOS: Record<EstiloCartola, string> = {
@@ -24,7 +33,16 @@ const ETIQUETAS_ESTILOS: Record<EstiloCartola, string> = {
   geometric: 'Geométrico',
   wellness: 'Bienestar',
   sale: 'Oferta',
+  christmas: 'Legacy (Antiguo)',
   delicate: 'Delicado',
+  christmas_classic: '🎄 Navidad Clásica',
+  christmas_white: '🎁 Navidad Elegante',
+  premium: '💎 Premium',
+  fresh: '🌊 Fresco',
+  modern_v2: '✨ Moderno V2',
+  impact: '⚠️ Impacto',
+  boho: '🌿 Boho',
+  grid: '📐 Grid',
 }
 
 // Mapa de colores para los degradados de fondo
@@ -37,7 +55,16 @@ const ESTILOS_COLORES: Record<EstiloCartola, [string, string]> = {
   geometric: ['#0ea5e9', '#0284c7'],
   wellness: ['#34d399', '#059669'],
   sale: ['#f87171', '#dc2626'],
+  christmas: ['#dc2626', '#991b1b'], // LEGACY: Mantenido para evitar errores con plantillas guardadas antiguas
   delicate: ['#fbcfe8', '#f9a8d4'],
+  christmas_classic: ['#15803d', '#14532d'], // Verde pino intenso
+  christmas_white: ['#f8f9fa', '#e9ecef'],   // Blanco mármol
+  premium: ['#1c1917', '#000000'],
+  fresh: ['#22d3ee', '#0ea5e9'],
+  modern_v2: ['#8b5cf6', '#6366f1'],
+  impact: ['#FCEE21', '#ebdd00'],
+  boho: ['#f5f5dc', '#e6d2b5'],
+  grid: ['#ffffff', '#ffffff'],
 }
 
 // Estado interno que representa todos los campos de texto de la cartola
@@ -134,7 +161,7 @@ const CartolaModal: React.FC<CartolaModalProps> = ({ open, onClose, preloadData 
     if (preloadData && open) {
       setData(preloadData.data);
       setEstilo(preloadData.estilo);
-      
+
       if (preloadData.styles) {
         setStyles(preloadData.styles);
       } else {
@@ -229,9 +256,9 @@ const CartolaModal: React.FC<CartolaModalProps> = ({ open, onClose, preloadData 
         mensajeFinal: { bold: false, color: '', spacing: 20, fontSize: 32 },
       }
       const newStyles = { ...defaults }
-      ;(Object.keys(plantilla.styles) as (keyof CartolaData)[]).forEach((key) => {
-        newStyles[key] = { ...defaults[key], ...plantilla.styles[key] }
-      })
+        ; (Object.keys(plantilla.styles) as (keyof CartolaData)[]).forEach((key) => {
+          newStyles[key] = { ...defaults[key], ...plantilla.styles[key] }
+        })
       return newStyles
     })
   }
@@ -543,10 +570,52 @@ function drawCartola(
   ctx.fillStyle = fondo
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-  // Color de texto: claro para fondos oscuros y oscuro para fondos claros
-  const textoClaro = isDark(colorInicio) || isDark(colorFin)
-    ? '#ffffff'
-    : '#1f2937'
+  // --- DECORACIONES DE FONDO SEGÚN ESTILO ---
+  if (estilo === 'christmas_classic') {
+    drawChristmasClassicDecorations(ctx, canvas.width, canvas.height)
+  } else if (estilo === 'christmas_white') {
+    drawChristmasWhiteDecorations(ctx, canvas.width, canvas.height)
+  } else if (estilo === 'premium') {
+    drawPremiumDecorations(ctx, canvas.width, canvas.height)
+  } else if (estilo === 'fresh') {
+    drawFreshDecorations(ctx, canvas.width, canvas.height)
+  } else if (estilo === 'modern_v2') {
+    drawModernV2Decorations(ctx, canvas.width, canvas.height)
+  } else if (estilo === 'impact') {
+    drawImpactDecorations(ctx, canvas.width, canvas.height)
+  } else if (estilo === 'boho') {
+    drawBohoDecorations(ctx, canvas.width, canvas.height)
+  } else if (estilo === 'grid') {
+    drawGridDecorations(ctx, canvas.width, canvas.height)
+  }
+
+  // Color de texto
+  let textoClaro = isDark(colorInicio) || isDark(colorFin) ? '#ffffff' : '#1f2937'
+
+  // Ajuste especial para Premium (textos dorados)
+  if (estilo === 'premium') {
+    textoClaro = '#d4af37' // Dorado
+  }
+  // Christmas White: Rojo elegante
+  if (estilo === 'christmas_white') {
+    textoClaro = '#b91c1c'
+  }
+  // Christmas Classic: Blanco o Dorado
+  if (estilo === 'christmas_classic') {
+    textoClaro = '#ffffff'
+  }
+  // Impact: siempre negro fuerte
+  if (estilo === 'impact') {
+    textoClaro = '#000000'
+  }
+  // Boho: marrón oscuro
+  if (estilo === 'boho') {
+    textoClaro = '#5d4037'
+  }
+  // Grid: negro casi puro
+  if (estilo === 'grid') {
+    textoClaro = '#111111'
+  }
 
   ctx.textAlign = 'center'
 
@@ -556,12 +625,31 @@ function drawCartola(
     const st = styles.titulo
     ctx.fillStyle = st.color || textoClaro
     const fontSize = st.fontSize || 64
-    ctx.font = `${st.bold ? 'bold ' : ''}${fontSize}px Arial`
+
+    // Fuentes especiales
+    let fontName = 'Arial'
+    if (estilo === 'premium') fontName = 'Times New Roman'
+    if (estilo === 'impact') fontName = 'Impact, Arial Black'
+    if (estilo === 'boho') fontName = 'Georgia'
+    if (estilo === 'grid') fontName = 'Courier New'
+    if (estilo === 'christmas_white' || estilo === 'christmas_classic') fontName = 'Georgia, Times New Roman'
+
+    ctx.font = `${st.bold ? 'bold ' : ''}${fontSize}px ${fontName}`
+
+    // Efecto de sombra para Navidad Classic
+    if (estilo === 'christmas_classic') {
+      ctx.shadowColor = 'rgba(0,0,0,0.8)'
+      ctx.shadowBlur = 15
+    }
+
     ctx.fillText(data.titulo, canvas.width / 2, y)
+
+    // Reset shadow
+    ctx.shadowBlur = 0
     y += fontSize + 16 + st.spacing
   }
 
-  // Oferta: recuadro semitransparente
+  // Oferta: recuadro
   if (data.oferta) {
     const st = styles.oferta
     const fontSize = st.fontSize || 32
@@ -569,11 +657,57 @@ function drawCartola(
     const ofertaY = y - 20
     const ofertaW = canvas.width - 100
     const ofertaH = fontSize * 2.5
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'
-    drawRoundedRect(ctx, ofertaX, ofertaY, ofertaW, ofertaH, 15)
-    ctx.fill()
-    ctx.fillStyle = st.color || textoClaro
-    ctx.font = `${st.bold ? 'bold ' : ''}${fontSize}px Arial`
+
+    // Estilo de fondo de oferta según el tema
+    if (estilo === 'premium') {
+      ctx.strokeStyle = '#d4af37'
+      ctx.lineWidth = 2
+      drawRoundedRect(ctx, ofertaX, ofertaY, ofertaW, ofertaH, 0)
+      ctx.stroke()
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
+      ctx.fill()
+    } else if (estilo === 'christmas_white') {
+      ctx.strokeStyle = '#b91c1c'
+      ctx.lineWidth = 1
+      drawRoundedRect(ctx, ofertaX, ofertaY, ofertaW, ofertaH, 5)
+      ctx.stroke()
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+      ctx.fill()
+    } else if (estilo === 'christmas_classic') {
+      ctx.fillStyle = '#b45309' // Gold-ish background for text? Or just translucent
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
+      drawRoundedRect(ctx, ofertaX, ofertaY, ofertaW, ofertaH, 10)
+      ctx.fill()
+      ctx.strokeStyle = '#fcd34d' // Gold border
+      ctx.lineWidth = 2
+      ctx.stroke()
+    } else if (estilo === 'impact') {
+      ctx.fillStyle = '#000000' // Negro
+      ctx.fillRect(ofertaX, ofertaY, ofertaW, ofertaH) // Recto, sin bordes redondos
+    } else if (estilo === 'grid') {
+      ctx.strokeStyle = '#000000'
+      ctx.lineWidth = 2
+      ctx.strokeRect(ofertaX, ofertaY, ofertaW, ofertaH)
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(ofertaX, ofertaY, ofertaW, ofertaH)
+    } else {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'
+      drawRoundedRect(ctx, ofertaX, ofertaY, ofertaW, ofertaH, 15)
+      ctx.fill()
+    }
+
+    // Color del texto de oferta
+    let ofertaColor = st.color || textoClaro
+    if (estilo === 'impact' && !st.color) ofertaColor = '#FCEE21' // Amarillo sobre negro
+    if (estilo === 'christmas_classic' && !st.color) ofertaColor = '#fcd34d' // Gold text
+
+    ctx.fillStyle = ofertaColor
+    let fontName = 'Arial'
+    if (estilo === 'grid') fontName = 'Courier New'
+    if (estilo === 'boho') fontName = 'Georgia'
+    if (estilo === 'christmas_white' || estilo === 'christmas_classic') fontName = 'Georgia'
+
+    ctx.font = `${st.bold ? 'bold ' : ''}${fontSize}px ${fontName}`
     const offerLineHeight = fontSize * 1.3
     drawTextWithLineBreaks(
       ctx,
@@ -616,9 +750,37 @@ function drawCartola(
     const headerSize = Math.max(18, Math.round(priceFontSize * 0.5))
     const prevSize = stPrev.fontSize || 24
     const precioH = headerSize + priceFontSize + prevSize + 40
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'
-    drawRoundedRect(ctx, precioX, precioY, precioW, precioH, 15)
-    ctx.fill()
+
+    // Fondo precio
+    // Fondo precio
+    if (estilo === 'christmas_classic') {
+      ctx.fillStyle = 'rgba(0,0,0,0.3)'
+      drawRoundedRect(ctx, precioX, precioY, precioW, precioH, 20)
+      ctx.fill()
+      ctx.strokeStyle = '#fcd34d'
+      ctx.lineWidth = 2
+      ctx.stroke()
+    } else if (estilo === 'christmas_white') {
+      // Nada de fondo, solo texto limpio o linea sutil
+      ctx.beginPath()
+      ctx.moveTo(precioX + 20, precioY + precioH)
+      ctx.lineTo(precioX + precioW - 20, precioY + precioH)
+      ctx.strokeStyle = '#b91c1c'
+      ctx.lineWidth = 1
+      ctx.stroke()
+    } else if (estilo === 'impact') {
+      ctx.fillStyle = '#000000'
+      ctx.fillRect(precioX, precioY, precioW, precioH)
+    } else if (estilo === 'grid') {
+      ctx.strokeStyle = '#000000'
+      ctx.lineWidth = 2
+      ctx.strokeRect(precioX, precioY, precioW, precioH)
+    } else {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'
+      drawRoundedRect(ctx, precioX, precioY, precioW, precioH, 15)
+      ctx.fill()
+    }
+
     let precioYCursor = precioY
     // Cabecera del precio
     ctx.fillStyle = stPrev.color || stAct.color || textoClaro
@@ -671,7 +833,23 @@ function drawCartola(
       const fontSize = st.fontSize || 28
       ctx.fillStyle = st.color || textoClaro
       ctx.font = `${st.bold ? 'bold ' : ''}${fontSize}px Arial`
-      ctx.fillText(`• ${texto}`, caracterX, caracterY + fontSize)
+
+      // Icono o bullet personalizado
+      let bullet = '•'
+      if (estilo === 'christmas_classic') bullet = '★'
+      if (estilo === 'christmas_white') bullet = '-'
+      if (estilo === 'premium') bullet = '✦'
+      if (estilo === 'fresh') bullet = '✓'
+      if (estilo === 'impact') bullet = '►'
+      if (estilo === 'boho') bullet = '✿'
+      if (estilo === 'grid') bullet = '▪'
+
+      let fontName = 'Arial'
+      if (estilo === 'grid') fontName = 'Courier New'
+      if (estilo === 'christmas_classic' || estilo === 'christmas_white') fontName = 'Georgia'
+      ctx.font = `${st.bold ? 'bold ' : ''}${fontSize}px ${fontName}`
+
+      ctx.fillText(`${bullet} ${texto}`, caracterX, caracterY + fontSize)
       caracterY += fontSize + 12 + st.spacing
     }
   })
@@ -693,6 +871,281 @@ function drawCartola(
     )
   }
 }
+
+// --- FUNCIONES DE DIBUJO ESPECÍFICAS ---
+
+function drawChristmasClassicDecorations(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  // Fondo verde pino profundo en degradado
+  const grad = ctx.createRadialGradient(width / 2, height / 2, 50, width / 2, height / 2, height)
+  grad.addColorStop(0, '#15803d')
+  grad.addColorStop(1, '#052e16') // Dark pine
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, width, height)
+
+  // Marco de "hojas" (pino estilizado - triángulos en bordes)
+  ctx.fillStyle = '#0f5132' // Darker green
+  const spikeSize = 40
+  // Top edge
+  for (let x = 0; x < width; x += spikeSize / 2) {
+    ctx.beginPath()
+    ctx.moveTo(x, 0)
+    ctx.lineTo(x + spikeSize / 2, spikeSize)
+    ctx.lineTo(x + spikeSize, 0)
+    ctx.fill()
+  }
+  // Bottom edge
+  for (let x = 0; x < width; x += spikeSize / 2) {
+    ctx.beginPath()
+    ctx.moveTo(x, height)
+    ctx.lineTo(x + spikeSize / 2, height - spikeSize)
+    ctx.lineTo(x + spikeSize, height)
+    ctx.fill()
+  }
+
+  // Estrellas doradas y nieve
+  ctx.fillStyle = 'rgba(255, 215, 0, 0.7)' // Gold
+  for (let i = 0; i < 30; i++) {
+    const x = Math.random() * width
+    const y = Math.random() * height
+    const r = Math.random() * 3 + 1
+    // Dibujar estrella simple (rombo)
+    ctx.beginPath()
+    ctx.moveTo(x, y - r * 2)
+    ctx.lineTo(x + r, y)
+    ctx.lineTo(x, y + r * 2)
+    ctx.lineTo(x - r, y)
+    ctx.fill()
+  }
+
+  // Confetti
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'
+  for (let i = 0; i < 50; i++) {
+    const x = Math.random() * width
+    const y = Math.random() * height
+    const r = Math.random() * 2
+    ctx.beginPath()
+    ctx.arc(x, y, r, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  // Copos de nieve (usando la función auxiliar)
+  for (let i = 0; i < 10; i++) {
+    const x = Math.random() * width
+    const y = Math.random() * height
+    const r = Math.random() * 15 + 10
+    drawSnowflake(ctx, x, y, r)
+  }
+}
+
+function drawChristmasWhiteDecorations(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  // Fondo blanco mármol (sutil textura)
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, width, height)
+
+  // Cinta roja de regalo (cruzada en la esquina inferior derecha)
+  ctx.save()
+  // Dibujar lazo rojo en la esquina inferior, estilo regalo
+  const ribbonWidth = 60
+
+  // Cinta vertical
+  ctx.fillStyle = '#b91c1c'
+  ctx.fillRect(width - 150, 0, ribbonWidth, height)
+
+  // Sombra a la cinta
+  ctx.fillStyle = 'rgba(0,0,0,0.1)'
+  ctx.fillRect(width - 150 - 5, 0, 5, height)
+
+  // Cinta horizontal (abajo)
+  ctx.fillStyle = '#b91c1c'
+  ctx.fillRect(0, height - 150, width, ribbonWidth)
+
+  // Sombra
+  ctx.fillStyle = 'rgba(0,0,0,0.1)'
+  ctx.fillRect(0, height - 150 - 5, width, 5)
+
+  // Lazo en la intersección
+  const cx = width - 150 + ribbonWidth / 2
+  const cy = height - 150 + ribbonWidth / 2
+
+  ctx.fillStyle = '#991b1b' // Darker red loop
+  ctx.beginPath()
+  ctx.ellipse(cx - 40, cy - 40, 40, 30, Math.PI / 4, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.beginPath()
+  ctx.ellipse(cx + 40, cy - 40, 40, 30, -Math.PI / 4, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = '#ef4444' // Bright red knot
+  ctx.beginPath()
+  ctx.arc(cx, cy, 25, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.restore()
+}
+
+function drawSnowflake(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number) {
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'
+  ctx.lineWidth = 3
+  ctx.lineCap = 'round'
+  for (let i = 0; i < 6; i++) {
+    ctx.rotate(Math.PI / 3)
+    ctx.beginPath()
+    ctx.moveTo(0, 0)
+    ctx.lineTo(0, radius)
+    ctx.stroke()
+    // Ramas
+    ctx.beginPath()
+    ctx.moveTo(0, radius * 0.6)
+    ctx.lineTo(radius * 0.3, radius * 0.8)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(0, radius * 0.6)
+    ctx.lineTo(-radius * 0.3, radius * 0.8)
+    ctx.stroke()
+  }
+  ctx.restore()
+}
+
+function drawPremiumDecorations(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  // Líneas elegantes doradas
+  ctx.strokeStyle = '#d4af37' // Dorado
+  ctx.lineWidth = 1
+
+  // Marco fino doble
+  ctx.strokeRect(30, 30, width - 60, height - 60)
+  ctx.lineWidth = 0.5
+  ctx.strokeRect(40, 40, width - 80, height - 80)
+
+  // Acentos en esquinas
+  const size = 60
+  ctx.lineWidth = 3
+
+  // Top-left
+  ctx.beginPath(); ctx.moveTo(30, 30 + size); ctx.lineTo(30, 30); ctx.lineTo(30 + size, 30); ctx.stroke()
+  // Top-right
+  ctx.beginPath(); ctx.moveTo(width - 30 - size, 30); ctx.lineTo(width - 30, 30); ctx.lineTo(width - 30, 30 + size); ctx.stroke()
+  // Bottom-right
+  ctx.beginPath(); ctx.moveTo(width - 30, height - 30 - size); ctx.lineTo(width - 30, height - 30); ctx.lineTo(width - 30 - size, height - 30); ctx.stroke()
+  // Bottom-left
+  ctx.beginPath(); ctx.moveTo(30 + size, height - 30); ctx.lineTo(30, height - 30); ctx.lineTo(30, height - 30 - size); ctx.stroke()
+}
+
+function drawFreshDecorations(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  // Círculos abstractos grandes y transparentes
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.1)'
+  ctx.beginPath()
+  ctx.arc(0, 0, 300, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.beginPath()
+  ctx.arc(width, height * 0.4, 200, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'
+  ctx.beginPath()
+  ctx.arc(width * 0.2, height, 400, 0, Math.PI * 2)
+  ctx.fill()
+}
+
+function drawModernV2Decorations(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  // Patrón geométrico de líneas diagonales
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'
+  ctx.lineWidth = 2
+  for (let i = -width; i < width * 2; i += 40) {
+    ctx.beginPath()
+    ctx.moveTo(i, 0)
+    ctx.lineTo(i - height, height)
+    ctx.stroke()
+  }
+}
+
+function drawImpactDecorations(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  // Franjas diagonales negras de advertencia
+  ctx.fillStyle = '#000000'
+  ctx.save()
+  // Crear clip para marco
+  ctx.beginPath()
+  ctx.rect(0, 0, width, 40) // Top bar
+  ctx.rect(0, height - 40, width, 40) // Bottom bar
+  ctx.clip()
+
+  // Dibujar rayas
+  for (let i = -width; i < width * 2; i += 60) {
+    ctx.beginPath()
+    ctx.moveTo(i, 0)
+    ctx.lineTo(i + 30, 0)
+    ctx.lineTo(i - height + 30, height)
+    ctx.lineTo(i - height, height)
+    ctx.fill()
+  }
+  ctx.restore()
+
+  // Marco grueso
+  ctx.strokeStyle = '#000000'
+  ctx.lineWidth = 10
+  ctx.strokeRect(5, 5, width - 10, height - 10)
+}
+
+function drawBohoDecorations(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  // Formas orgánicas (blobs)
+  const drawBlob = (x: number, y: number, size: number, color: string) => {
+    ctx.fillStyle = color
+    ctx.beginPath()
+    ctx.arc(x, y, size, 0, Math.PI * 2) // Simple circle for now, or bezier for blob
+    ctx.fill()
+  }
+
+  // Esquina superior izquierda
+  ctx.fillStyle = '#d4c4a8' // Darker beige
+  ctx.beginPath()
+  ctx.moveTo(0, 200)
+  ctx.bezierCurveTo(100, 180, 200, 100, 200, 0)
+  ctx.lineTo(0, 0)
+  ctx.fill()
+
+  // Esquina inferior derecha
+  ctx.beginPath()
+  ctx.moveTo(width, height - 200)
+  ctx.bezierCurveTo(width - 100, height - 180, width - 200, height - 100, width - 200, height)
+  ctx.lineTo(width, height)
+  ctx.fill()
+
+  // Circulo organico
+  ctx.fillStyle = 'rgba(255,255,255,0.4)'
+  ctx.beginPath()
+  ctx.arc(width * 0.8, height * 0.2, 80, 0, Math.PI * 2)
+  ctx.fill()
+}
+
+function drawGridDecorations(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  ctx.strokeStyle = '#e5e5e5'
+  ctx.lineWidth = 1
+
+  // Grid cuadriculado de fondo
+  const cellSize = 50
+  for (let x = 0; x <= width; x += cellSize) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+  }
+  for (let y = 0; y <= height; y += cellSize) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+  }
+
+  // Línea fuerte arriba y abajo
+  ctx.strokeStyle = '#000000'
+  ctx.lineWidth = 4
+  ctx.beginPath()
+  ctx.moveTo(40, 110)
+  ctx.lineTo(width - 40, 110)
+  ctx.stroke()
+
+  ctx.beginPath()
+  ctx.moveTo(40, height - 100)
+  ctx.lineTo(width - 40, height - 100)
+  ctx.stroke()
+}
+
 
 // Dibuja un rectángulo con esquinas redondeadas
 function drawRoundedRect(
