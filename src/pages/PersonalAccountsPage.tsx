@@ -539,7 +539,7 @@ const PersonalAccountsPage: React.FC = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {filteredAccounts.map((account: PersonalAccount) => (
-                                <div key={account.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow relative group">
+                                <div key={account.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow relative group flex flex-col h-full">
                                     <div className="absolute top-14 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                         <button
                                             onClick={() => handleEdit(account)}
@@ -560,7 +560,7 @@ const PersonalAccountsPage: React.FC = () => {
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
                                             <h3 className="text-lg font-bold text-gray-900">{account.customerName}</h3>
-                                            <p className="text-sm text-gray-500 whitespace-pre-wrap mt-1">{account.productDetails}</p>
+                                            <p className="text-sm text-gray-500 mt-1 line-clamp-2 h-10 overflow-hidden">{account.productDetails}</p>
                                         </div>
                                         <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ml-2 ${statusColors[account.status]}`}>
                                             {statusLabels[account.status]}
@@ -616,7 +616,7 @@ const PersonalAccountsPage: React.FC = () => {
                                         )}
                                     </div>
 
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 mt-auto">
                                         <button
                                             onClick={() => handlePayment(account)}
                                             disabled={account.status === 'completed'}
