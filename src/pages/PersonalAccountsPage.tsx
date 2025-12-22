@@ -13,7 +13,9 @@ import {
     X,
     CreditCard,
     Edit,
-    Trash2
+    Trash2,
+    ArrowUp,
+    ArrowDown
 } from 'lucide-react';
 import { usePersonalAccounts } from '../hooks/usePersonalAccounts';
 import { PersonalAccount } from '../types';
@@ -318,11 +320,14 @@ const PersonalAccountsPage: React.FC = () => {
     const { accounts, loading, addAccount, updateAccount, deleteAccount, registerPayment } = usePersonalAccounts() as any;
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'completed' | 'late'>('all');
+    const [sortBy, setSortBy] = useState<'upcoming' | 'name' | 'date'>('upcoming');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedAccount, setSelectedAccount] = useState<PersonalAccount | null>(null);
 
     const filteredAccounts = useMemo(() => {
-        return accounts.filter((account: PersonalAccount) => {
+        // 1. Filter
+        const matches = accounts.filter((account: PersonalAccount) => {
             const matchesSearch =
                 account.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 account.productDetails.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -332,7 +337,44 @@ const PersonalAccountsPage: React.FC = () => {
 
             return matchesSearch && matchesStatus;
         });
-    }, [accounts, searchQuery, filterStatus]);
+
+        // 2. Sort
+        const getNextDueDate = (account: PersonalAccount) => {
+            if (!account.startDate) return Infinity;
+            const date = new Date(account.startDate);
+            // Default to 1st installment date = startDate + 1 month typically?
+            // Or if startDate is the purchase date, usually 1st installment is next month.
+            // But let's assume due date logic:
+            // "Next payment date" = startDate + (paidInstallments + 1) months?
+            // Or if paidInstallments = 0, next is startDate + 1 month.
+            // Let's stick to a simple proxy: startDate + paidInstallments (months) roughly indicates progress.
+            // Actually, if I paid 0, next due is likely "now" or "next month".
+            // If I paid 5, next due is 5 months after start.
+            date.setMonth(date.getMonth() + (account.paidInstallments || 0));
+            return date.getTime();
+        };
+
+        return matches.sort((a: PersonalAccount, b: PersonalAccount) => {
+            let comparison = 0;
+
+            if (sortBy === 'name') {
+                comparison = a.customerName.localeCompare(b.customerName);
+            } else if (sortBy === 'date') {
+                // Default date sort: Newest (bigger time) < Oldest (smaller time) if we want "Newest First" as typical 'desc'?
+                // Let's standardise: comparison > 0 means a > b.
+                // Time: a.time - b.time -> Ascending (Oldest first)
+                comparison = new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+            } else if (sortBy === 'upcoming') {
+                // Completed accounts always go to bottom regardless of order usually, but let's just sort by value
+                if (a.status === 'completed' && b.status !== 'completed') return 1;
+                if (b.status === 'completed' && a.status !== 'completed') return -1;
+
+                comparison = getNextDueDate(a) - getNextDueDate(b);
+            }
+
+            return sortOrder === 'asc' ? comparison : -comparison;
+        });
+    }, [accounts, searchQuery, filterStatus, sortBy, sortOrder]);
 
     const handleSaveAccount = async (data: Omit<PersonalAccount, 'id'>) => {
         if (selectedAccount?.id) {
@@ -366,6 +408,18 @@ const PersonalAccountsPage: React.FC = () => {
     const handleEdit = (account: PersonalAccount) => {
         setSelectedAccount(account);
         setIsModalOpen(true);
+    };
+
+    const handleSort = (option: 'upcoming' | 'name' | 'date') => {
+        if (sortBy === option) {
+            setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(option);
+            // Set reasonable defaults
+            if (option === 'date') setSortOrder('desc'); // Newest first
+            else if (option === 'upcoming') setSortOrder('asc'); // Nearest first
+            else setSortOrder('asc'); // A-Z
+        }
     };
 
     const statusColors = {
@@ -407,8 +461,8 @@ const PersonalAccountsPage: React.FC = () => {
                         </button>
                     </div>
 
-                    {/* Filters */}
-                    <div className="mt-4 flex flex-col md:flex-row gap-4">
+                    {/* Filters and Sorting */}
+                    <div className="mt-4 flex flex-col lg:flex-row gap-4">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                             <input
@@ -419,19 +473,23 @@ const PersonalAccountsPage: React.FC = () => {
                                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
-                        <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
-                            {(['all', 'active', 'completed', 'late'] as const).map((status) => (
-                                <button
-                                    key={status}
-                                    onClick={() => setFilterStatus(status)}
-                                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${filterStatus === status
-                                        ? 'bg-white text-gray-900 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
-                                        }`}
-                                >
-                                    {status === 'all' ? 'Todas' : statusLabels[status]}
-                                </button>
-                            ))}
+
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            {/* Filter Buttons */}
+                            <div className="flex gap-2 bg-gray-100 p-1 rounded-lg overflow-x-auto">
+                                {(['all', 'active', 'completed', 'late'] as const).map((status) => (
+                                    <button
+                                        key={status}
+                                        onClick={() => setFilterStatus(status)}
+                                        className={`px-3 sm:px-4 py-1.5 rounded-md text-sm font-medium transition-all whitespace-nowrap ${filterStatus === status
+                                            ? 'bg-white text-gray-900 shadow-sm'
+                                            : 'text-gray-500 hover:text-gray-700'
+                                            }`}
+                                    >
+                                        {status === 'all' ? 'Todas' : statusLabels[status]}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -452,97 +510,125 @@ const PersonalAccountsPage: React.FC = () => {
                         <p className="text-gray-500">Intenta cambiar los filtros o crea una nueva cuenta.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredAccounts.map((account: PersonalAccount) => (
-                            <div key={account.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow relative group">
-                                <div className="absolute top-14 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    <>
+                        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                            <p className="text-sm text-gray-500">
+                                Mostrando <span className="font-medium text-gray-900">{filteredAccounts.length}</span> cuentas
+                            </p>
+                            <div className="flex items-center gap-2 bg-white border border-gray-200 p-1 rounded-lg shadow-sm">
+                                <span className="text-xs font-medium text-gray-500 px-2 uppercase">Ordenar:</span>
+                                {(['upcoming', 'name', 'date'] as const).map((option) => (
                                     <button
-                                        onClick={() => handleEdit(account)}
-                                        className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                        title="Editar"
+                                        key={option}
+                                        onClick={() => handleSort(option)}
+                                        className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all whitespace-nowrap flex items-center gap-1 ${sortBy === option
+                                            ? 'bg-blue-50 text-blue-700 font-semibold shadow-sm ring-1 ring-blue-100'
+                                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                            }`}
                                     >
-                                        <Edit className="w-4 h-4" />
+                                        {option === 'upcoming' ? 'Vencimiento' :
+                                            option === 'name' ? 'Nombre' : 'Fecha'}
+
+                                        {sortBy === option && (
+                                            sortOrder === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />
+                                        )}
                                     </button>
-                                    <button
-                                        onClick={() => handleDelete(account)}
-                                        className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                        title="Eliminar"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-                                </div>
-
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 className="text-lg font-bold text-gray-900">{account.customerName}</h3>
-                                        <p className="text-sm text-gray-500 whitespace-pre-wrap mt-1">{account.productDetails}</p>
-                                    </div>
-                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ml-2 ${statusColors[account.status]}`}>
-                                        {statusLabels[account.status]}
-                                    </span>
-                                </div>
-
-                                <div className="space-y-3 mb-6">
-                                    {account.amount && (
-                                        <div className="flex items-center gap-2 text-sm text-gray-900 bg-gray-50 p-2 rounded-lg mb-2 font-bold justify-between">
-                                            <span>Total Venta:</span>
-                                            <span className="text-blue-700">${account.amount.toLocaleString('es-AR')}</span>
-                                        </div>
-                                    )}
-
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <DollarSign className="w-4 h-4 text-gray-400" />
-                                        <span>
-                                            Cuota: <span className="font-semibold text-gray-900">${account.amountPerInstallment.toLocaleString('es-AR')}</span>
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <Clock className="w-4 h-4 text-gray-400" />
-                                        <span>
-                                            Progreso: {account.paidInstallments} / {account.totalInstallments} cuotas
-                                        </span>
-                                    </div>
-                                    {/* Progress Bar */}
-                                    {/* Segmented Progress Bar */}
-                                    <div className="flex gap-1 w-full">
-                                        {Array.from({ length: account.totalInstallments }).map((_, index) => (
-                                            <div
-                                                key={index}
-                                                className={`h-2 flex-1 rounded-full transition-colors duration-300 ${index < account.paidInstallments ? 'bg-blue-600' : 'bg-gray-200'
-                                                    }`}
-                                                title={`Cuota ${index + 1}`}
-                                            />
-                                        ))}
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <Calendar className="w-4 h-4 text-gray-400" />
-                                        <span>
-                                            Inicio: {new Date(account.startDate).toLocaleDateString('es-AR')}
-                                        </span>
-                                    </div>
-                                    {account.isDelivered ? (
-                                        <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 px-2 py-1 rounded">
-                                            <CheckCircle className="w-4 h-4" /> Entregado
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 px-2 py-1 rounded">
-                                            <AlertCircle className="w-4 h-4" /> Pendiente de Entrega
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => handlePayment(account)}
-                                        disabled={account.status === 'completed'}
-                                        className="flex-1 bg-blue-50 text-blue-700 py-2 rounded-lg font-medium hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        Registrar Pago
-                                    </button>
-                                </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {filteredAccounts.map((account: PersonalAccount) => (
+                                <div key={account.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow relative group">
+                                    <div className="absolute top-14 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                        <button
+                                            onClick={() => handleEdit(account)}
+                                            className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                            title="Editar"
+                                        >
+                                            <Edit className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(account)}
+                                            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                            title="Eliminar"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900">{account.customerName}</h3>
+                                            <p className="text-sm text-gray-500 whitespace-pre-wrap mt-1">{account.productDetails}</p>
+                                        </div>
+                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ml-2 ${statusColors[account.status]}`}>
+                                            {statusLabels[account.status]}
+                                        </span>
+                                    </div>
+
+                                    <div className="space-y-3 mb-6">
+                                        {account.amount && (
+                                            <div className="flex items-center gap-2 text-sm text-gray-900 bg-gray-50 p-2 rounded-lg mb-2 font-bold justify-between">
+                                                <span>Total Venta:</span>
+                                                <span className="text-blue-700">${account.amount.toLocaleString('es-AR')}</span>
+                                            </div>
+                                        )}
+
+                                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                                            <DollarSign className="w-4 h-4 text-gray-400" />
+                                            <span>
+                                                Cuota: <span className="font-semibold text-gray-900">${account.amountPerInstallment.toLocaleString('es-AR')}</span>
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                                            <Clock className="w-4 h-4 text-gray-400" />
+                                            <span>
+                                                Progreso: {account.paidInstallments} / {account.totalInstallments} cuotas
+                                            </span>
+                                        </div>
+                                        {/* Progress Bar */}
+                                        {/* Segmented Progress Bar */}
+                                        <div className="flex gap-1 w-full">
+                                            {Array.from({ length: account.totalInstallments }).map((_, index) => (
+                                                <div
+                                                    key={index}
+                                                    className={`h-2 flex-1 rounded-full transition-colors duration-300 ${index < account.paidInstallments ? 'bg-blue-600' : 'bg-gray-200'
+                                                        }`}
+                                                    title={`Cuota ${index + 1}`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                                            <Calendar className="w-4 h-4 text-gray-400" />
+                                            <span>
+                                                Inicio: {new Date(account.startDate).toLocaleDateString('es-AR')}
+                                            </span>
+                                        </div>
+                                        {account.isDelivered ? (
+                                            <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 px-2 py-1 rounded">
+                                                <CheckCircle className="w-4 h-4" /> Entregado
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 px-2 py-1 rounded">
+                                                <AlertCircle className="w-4 h-4" /> Pendiente de Entrega
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => handlePayment(account)}
+                                            disabled={account.status === 'completed'}
+                                            className="flex-1 bg-blue-50 text-blue-700 py-2 rounded-lg font-medium hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Registrar Pago
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
             </div>
 
