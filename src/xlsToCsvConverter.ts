@@ -93,33 +93,41 @@ export function convertXlsToCsv(arrayBuffer: ArrayBuffer): ExcelConversionResult
             return { success: false, error: XML_ERROR_MESSAGES.EMPTY_FILE };
         }
 
-        // Find header row (usually the first one, but we could search for it)
-        // For simplicity, we assume row 0 is headers
+        // Intentar detectar una fila de encabezado (archivos con "codigo", "precio", etc.)
         const headers = data[0].map((h: any) => String(h));
+        const headerCodeIdx = findColumnIndex(headers, FIELD_MAPPINGS.codigo);
+        const headerPriceIdx = findColumnIndex(headers, FIELD_MAPPINGS.precio);
 
-        // Map columns
-        const codeIdx = findColumnIndex(headers, FIELD_MAPPINGS.codigo);
-        const priceIdx = findColumnIndex(headers, FIELD_MAPPINGS.precio);
-        const nameIdx = findColumnIndex(headers, FIELD_MAPPINGS.nombre);
-        const sizeIdx = findColumnIndex(headers, FIELD_MAPPINGS.medida);
-        const statusIdx = findColumnIndex(headers, FIELD_MAPPINGS.estado);
+        let codeIdx: number, priceIdx: number, nameIdx: number, sizeIdx: number, statusIdx: number;
+        let startRow: number;
 
-        // Validate required columns
-        if (codeIdx === -1 || priceIdx === -1) {
-            return {
-                success: false,
-                error: "No se encontraron las columnas obligatorias: Código y Precio."
-            };
+        if (headerCodeIdx !== -1 && headerPriceIdx !== -1) {
+            // Archivo CON encabezado: usar las columnas mapeadas y saltar la fila 0.
+            codeIdx = headerCodeIdx;
+            priceIdx = headerPriceIdx;
+            nameIdx = findColumnIndex(headers, FIELD_MAPPINGS.nombre);
+            sizeIdx = findColumnIndex(headers, FIELD_MAPPINGS.medida);
+            statusIdx = findColumnIndex(headers, FIELD_MAPPINGS.estado);
+            startRow = 1;
+        } else {
+            // Archivo SIN encabezado (lista mayorista del proveedor): layout fijo por
+            // posición [codigo, nombre, medida, precio, estado]. Procesamos todas las
+            // filas; las de título/vacías se descartan porque no tienen código o precio.
+            codeIdx = 0;
+            nameIdx = 1;
+            sizeIdx = 2;
+            priceIdx = 3;
+            statusIdx = 4;
+            startRow = 0;
         }
 
         // Process rows
-        // Start from index 1 (skip headers)
         let validProductsCount = 0;
         const csvRows = [];
         const csvHeader = "codigo,nombre,medida,precio,estado";
         csvRows.push(csvHeader);
 
-        for (let i = 1; i < data.length; i++) {
+        for (let i = startRow; i < data.length; i++) {
             const row = data[i];
             if (!row || row.length === 0) continue;
 
@@ -175,4 +183,86 @@ export function convertXlsToCsv(arrayBuffer: ArrayBuffer): ExcelConversionResult
             error: "Error al procesar el archivo Excel. Asegúrate de que sea un archivo válido."
         };
     }
+}
+
+/**
+ * Convierte un valor de precio (número o string) a número limpio.
+ * Acepta números directos (lo ideal) y strings " $ 92.791,65 " / " $ 92,791.65 ".
+ */
+function parsePriceValue(value: any): number {
+    if (value === null || value === undefined) return NaN;
+    if (typeof value === 'number') return value;
+    let s = String(value).replace(/[^0-9.,-]/g, '');
+    if (!s) return NaN;
+    const lastComma = s.lastIndexOf(',');
+    const lastDot = s.lastIndexOf('.');
+    if (lastComma > -1 && lastDot > -1) {
+        // El último separador es el decimal.
+        s = lastComma > lastDot
+            ? s.replace(/\./g, '').replace(',', '.')   // AR: 92.791,65
+            : s.replace(/,/g, '');                      // US: 92,791.65
+    } else if (lastComma > -1) {
+        s = s.replace(',', '.');                        // 92791,65
+    }
+    return parseFloat(s);
+}
+
+/**
+ * Lee un archivo Excel (.xls/.xlsx) de lista mayorista y devuelve directamente un
+ * mapa código -> precio de COSTO, SIN pasar por CSV. Toma el valor numérico real de
+ * la celda (raw), que es mucho más robusto que parsear strings con $ y separadores.
+ *
+ * Layout del proveedor (sin encabezado): [codigo, nombre, medida, precio, estado].
+ * Si el archivo trae un encabezado con nombres reconocibles, se usan esas columnas.
+ * Los sommiers (códigos no numéricos) no vienen en la lista: se recalculan aparte.
+ */
+export function parseXlsPriceMap(arrayBuffer: ArrayBuffer): { priceMap: Record<string, number>; count: number } {
+    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    if (!sheetName) return { priceMap: {}, count: 0 };
+
+    const worksheet = workbook.Sheets[sheetName];
+    const data: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true, blankrows: false });
+    if (!data || data.length === 0) return { priceMap: {}, count: 0 };
+
+    // Detectar encabezado; si no hay, usar el layout fijo por posición.
+    const headers = (data[0] || []).map((h: any) => String(h));
+    const headerCodeIdx = findColumnIndex(headers, FIELD_MAPPINGS.codigo);
+    const headerPriceIdx = findColumnIndex(headers, FIELD_MAPPINGS.precio);
+
+    let codeIdx: number, priceIdx: number, startRow: number;
+    if (headerCodeIdx !== -1 && headerPriceIdx !== -1) {
+        codeIdx = headerCodeIdx;
+        priceIdx = headerPriceIdx;
+        startRow = 1;
+    } else {
+        codeIdx = 0;
+        priceIdx = 3;
+        startRow = 0;
+    }
+
+    const priceMap: Record<string, number> = {};
+    for (let i = startRow; i < data.length; i++) {
+        const row = data[i];
+        if (!row || row.length === 0) continue;
+
+        const codeRaw = row[codeIdx];
+        const priceRaw = row[priceIdx];
+        if (codeRaw === undefined || codeRaw === null || String(codeRaw).trim() === '') continue;
+        if (priceRaw === undefined || priceRaw === null) continue;
+
+        const price = parsePriceValue(priceRaw);
+        if (isNaN(price) || price <= 0) continue;
+
+        // Normalizar código numérico (500040 / "500040.0" -> "500040").
+        let code = String(codeRaw).trim();
+        if (!isNaN(Number(code))) code = parseInt(code, 10).toString();
+
+        // Solo códigos de producto numéricos (descarta títulos y sommiers).
+        if (!/^\d+$/.test(code)) continue;
+
+        priceMap[code] = price;
+    }
+
+    return { priceMap, count: Object.keys(priceMap).length };
 }

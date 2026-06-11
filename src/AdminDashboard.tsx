@@ -21,7 +21,6 @@ import { useCashSales } from "./hooks/useCashSales";
 import { FILTER_CHIPS } from "./components/IconComponents";
 import {
   TARJETA_FACTOR,
-  SOMMIER_MAPPING,
   SUCCESS_MESSAGES,
   ERROR_MESSAGES,
   CONFIRMATION_MESSAGES,
@@ -40,7 +39,7 @@ import { StockManagementModal } from "./components/admin/StockManagementModal";
 import { ProductImage } from "./ProductImage";
 import { useAuth } from './contexts/AuthContext';
 import { convertXmlToCsv } from './xmlToCsvConverter';
-import { convertXlsToCsv } from './xlsToCsvConverter';
+import { parseXlsPriceMap } from './xlsToCsvConverter';
 import { useProducts } from './contexts/ProductContext';
 import { useStore } from './contexts/StoreContext';
 
@@ -214,6 +213,56 @@ const AdminDashboard: React.FC = () => {
     });
   };
 
+  // Aplica un mapa código->precio de costo a los productos y persiste en Firestore.
+  // Colchones/boxes: precioContado = costo × 2 ; precioTarjeta = ×1.4.
+  // Sommiers: suma de los precioContado de sus `componentes` (colchón + box[es]).
+  // Solo se recalculan precios; el resto de los campos se preserva.
+  const applyPriceMapAndSave = async (priceMap: Record<string, number>) => {
+    // 1) Actualizar colchones, boxes y demás (no sommiers).
+    const pricedProducts = products.map((p) => {
+      if (p.tipo === "SOMMIERS") return p;
+      const newPrice = priceMap[p.codigo];
+      if (newPrice != null) {
+        const contadoPublic = Math.round((newPrice * 2 + Number.EPSILON) * 100) / 100;
+        const newTarjeta = Math.round((contadoPublic * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
+        return { ...p, precioContado: contadoPublic, precioTarjeta: newTarjeta };
+      }
+      return p;
+    });
+
+    // Índice por código sobre los productos YA actualizados (evita usar precios viejos).
+    const byCode = new Map(pricedProducts.map((p) => [p.codigo, p]));
+
+    // 2) Recalcular cada sommier sumando sus `componentes` (colchón + box[es]).
+    //    La composición vive en el campo `componentes` de cada documento SOMxxx en
+    //    Firestore. Un código repetido suma su precio varias veces (p. ej. 2 boxes en
+    //    los sommiers de 160/180/200).
+    const updatedProducts = pricedProducts.map((p) => {
+      if (p.tipo !== "SOMMIERS") return p;
+      const componentes = p.componentes;
+      if (!componentes || componentes.length === 0) return p;
+      const sum = componentes.reduce((acc, code) => {
+        const item = byCode.get(code);
+        return acc + (item ? item.precioContado : 0);
+      }, 0);
+      const contado = Math.round((sum + Number.EPSILON) * 100) / 100;
+      const newTarjeta = Math.round((contado * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
+      return { ...p, precioContado: contado, precioTarjeta: newTarjeta };
+    });
+
+    // Persistir en Firestore (la web se nutre de Firestore vía onSnapshot).
+    await updateProductsBatch(updatedProducts);
+
+    // Registrar acción offline si no hay conexión.
+    if (!isOnline && currentUser) {
+      await addOfflineAction({
+        type: 'IMPORT_PRICES',
+        priceMap,
+        timestamp: Date.now()
+      }, currentUser.username);
+    }
+  };
+
   // Función reutilizable para procesar contenido CSV
   const processCSVContent = async (csvContent: string) => {
     const lines = csvContent.split(/\r?\n/).filter((ln) => ln.trim());
@@ -333,62 +382,7 @@ const AdminDashboard: React.FC = () => {
       }
     });
 
-    // Calculate new products locally first
-    const updatedProducts = products.map((p) => {
-      if (p.tipo === "SOMMIERS") return p;
-      const newPrice = priceMap[p.codigo];
-      if (newPrice != null) {
-        const contadoPublic = Math.round((newPrice * 2 + Number.EPSILON) * 100) / 100;
-        const newTarjeta = Math.round((contadoPublic * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
-        return { ...p, precioContado: contadoPublic, precioTarjeta: newTarjeta };
-      }
-      return p;
-    }).map((p) => {
-      if (p.tipo !== "SOMMIERS") return p;
-      const combo = SOMMIER_MAPPING[p.codigo];
-      if (!combo) return p;
-      let sum = 0;
-      combo.forEach((code) => {
-        const item = products.find((it) => it.codigo === code);
-        // Note: We need to use the Updated price of components here.
-        // Since map runs sequentially, if 'products' is old, we need to look check 
-        // if the component was updated in the previous map step.
-        // Optimization: Create a map of updated items first.
-
-        // However, for this implementation, let's fix the logic to be robust:
-        // Check priceMap for the component price first
-        const componentPriceRaw = priceMap[code];
-        if (componentPriceRaw !== undefined) {
-          const compContado = Math.round((componentPriceRaw * 2 + Number.EPSILON) * 100) / 100;
-          sum += compContado;
-        } else {
-          // Fallback to existing product price if not in CSV
-          const existing = products.find(it => it.codigo === code);
-          if (existing) sum += existing.precioContado;
-        }
-      });
-      sum = Math.round((sum + Number.EPSILON) * 100) / 100;
-      const newTarjeta = Math.round((sum * TARJETA_FACTOR + Number.EPSILON) * 100) / 100;
-      return { ...p, precioContado: sum, precioTarjeta: newTarjeta };
-    });
-
-    // BATCH UPDATE TO FIRESTORE
-    try {
-      await updateProductsBatch(updatedProducts);
-      showToastMessage(SUCCESS_MESSAGES.PRICES_UPDATED);
-    } catch (error) {
-      console.error("Error updating Firestore:", error);
-      showToastMessage("Error saving to database");
-    }
-
-    // Registrar acción offline si no hay conexión (keep independent of Firestore for now)
-    if (!isOnline && currentUser) {
-      await addOfflineAction({
-        type: 'IMPORT_PRICES',
-        priceMap,
-        timestamp: Date.now()
-      }, currentUser.username);
-    }
+    await applyPriceMapAndSave(priceMap);
   };
 
   // Importar lista de precios desde un archivo CSV
@@ -443,7 +437,9 @@ const AdminDashboard: React.FC = () => {
     reader.readAsText(file);
   };
 
-  // Importar lista de precios desde un archivo Excel
+  // Importar lista de precios desde un archivo Excel (.xls/.xlsx) del proveedor.
+  // Lee el Excel DIRECTO (sin convertir a CSV): toma el valor numérico real de cada
+  // celda, recalcula precios y actualiza Firestore. La web se nutre de Firestore.
   const handleImportXlsPriceList = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -453,20 +449,26 @@ const AdminDashboard: React.FC = () => {
       try {
         const arrayBuffer = e.target?.result as ArrayBuffer;
 
-        // Convertir Excel a CSV
-        const result = convertXlsToCsv(arrayBuffer);
+        // Leer el Excel directamente a un mapa código -> precio de costo.
+        const { priceMap, count } = parseXlsPriceMap(arrayBuffer);
 
-        if (!result.success) {
-          showToastMessage(result.error || ERROR_MESSAGES.INVALID_FILE);
+        if (count === 0) {
+          showToastMessage(
+            "No se encontraron productos en el Excel. Verificá que tenga el código en la 1ª columna y el precio en la 4ª."
+          );
           return;
         }
 
-        // Procesar el CSV generado usando la lógica existente
-        const csvContent = result.csvContent!;
-        await processCSVContent(csvContent);
+        const matched = Object.keys(priceMap).filter((c) =>
+          products.some((p) => p.codigo === c)
+        ).length;
 
+        await applyPriceMapAndSave(priceMap);
+
+        const notFound = count - matched;
         showToastMessage(
-          `¡Precios actualizados! (${result.productsCount} productos)`
+          `¡Precios actualizados! ${matched} producto(s) del catálogo` +
+            (notFound > 0 ? `, ${notFound} código(s) del Excel sin coincidencia.` : ".")
         );
       } catch (error) {
         console.error(error);

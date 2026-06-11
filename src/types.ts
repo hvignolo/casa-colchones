@@ -14,6 +14,12 @@ export interface Product {
   stock?: number;
   minStock?: number;
   images?: string[];
+  /**
+   * Solo para productos tipo SOMMIERS: códigos de los productos [colchón, box, ...]
+   * que lo componen. El precio del sommier se calcula sumando el precioContado de
+   * cada componente (un código repetido suma su precio varias veces, p. ej. 2 boxes).
+   */
+  componentes?: string[];
 }
 
 // Interfaz para los datos de la tienda

@@ -66,16 +66,31 @@ describe('xlsToCsvConverter', () => {
             expect(result.error).toBe(XML_ERROR_MESSAGES.EMPTY_FILE);
         });
 
-        it('should return error if required columns are missing', () => {
-            // Mock data with missing columns
+        it('should return error if there are no valid product rows', () => {
+            // Sin encabezado reconocible y sin filas con código+precio por posición.
             mockSheetToJson.mockReturnValue([
-                ['nombre', 'otro'], // Headers
+                ['nombre', 'otro'],
                 ['Producto 1', 'algo']
             ]);
 
             const result = convertXlsToCsv(new ArrayBuffer(8));
             expect(result.success).toBe(false);
-            expect(result.error).toContain('No se encontraron las columnas obligatorias');
+            expect(result.error).toBe(XML_ERROR_MESSAGES.NO_PRODUCTS_FOUND);
+        });
+
+        it('should convert a headerless supplier file using positional columns', () => {
+            // Lista mayorista típica: fila de título + filas [codigo, nombre, medida, precio, estado]
+            // sin encabezado de columnas.
+            mockSheetToJson.mockReturnValue([
+                [null, 'LISTA MAYORISTA 18/05/2026'],
+                ['500108', 'TM NOCHE', '80.20', 122014.77],
+                ['500085', 'BOX EXTRA', '80.00', 55852.90]
+            ]);
+
+            const result = convertXlsToCsv(new ArrayBuffer(8));
+            expect(result.success).toBe(true);
+            expect(result.productsCount).toBe(2);
+            expect(result.csvContent).toContain('500108,TM NOCHE,80.20,122014.77,activo');
         });
 
         it('should successfully convert valid data', () => {
