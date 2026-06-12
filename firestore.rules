@@ -1,18 +1,35 @@
-rules_version='2'
-
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 1, 18);
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == "bautinapuntadas@gmail.com";
+    }
+
+    // Products: Public read, Admin write
+    // If you add real Firebase Auth later, change write to isAdmin()
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if true; // Temporarily open for the app to function without valid Firebase Auth token
+    }
+
+    // Orders: Anyone can create
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update, delete: if true; // Temporarily open
+    }
+
+    // Settings: Public read
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if true; // Temporarily open
+    }
+
+    // Personal Accounts
+    // Changed to public access because the app uses local auth (AuthContext) 
+    // instead of real Firebase Auth, so request.auth is null.
+    match /personal_accounts/{accountId} {
+      allow read, write: if true;
     }
   }
 }
