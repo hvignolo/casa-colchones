@@ -1,9 +1,16 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User as FirebaseUser,
+} from 'firebase/auth';
+import { auth } from '../firebaseConfig';
 import { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
-  login: (username: string, password: string, businessName: string) => Promise<boolean>;
+  login: (email: string, password: string, businessName: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -23,48 +30,33 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+// Mapea el usuario de Firebase Auth al modelo interno de la app
+const mapFirebaseUser = (fbUser: FirebaseUser): User => ({
+  username: fbUser.email || '',
+  password: '', // Ya no almacenamos la contraseña: Firebase gestiona la sesión
+  businessName: 'La Casa de los Colchones',
+  registeredAt: fbUser.metadata.creationTime || new Date().toISOString(),
+});
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from localStorage on app start
+  // Firebase mantiene la sesión persistida; escuchamos los cambios de estado
   useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const savedUserData = localStorage.getItem("currentUser");
-        if (savedUserData) {
-          const savedUser = JSON.parse(savedUserData);
-          setUser(savedUser);
-        }
-      } catch (error) {
-        console.error('Error loading user:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+      setUser(fbUser ? mapFirebaseUser(fbUser) : null);
+      setIsLoading(false);
+    });
 
-    loadUser();
+    return () => unsubscribe();
   }, []);
 
-
-
-  const login = async (username: string, password: string, businessName: string): Promise<boolean> => {
+  const login = async (email: string, password: string, _businessName: string): Promise<boolean> => {
     try {
-      // Hardcoded credentials check
-      if (username === 'hvignolo' && password === 'reposar0833') {
-        const adminUser: User = {
-          username: 'hvignolo',
-          password: 'reposar0833', // In a real app, don't store plain text password in user object
-          businessName: 'La Casa de los Colchones',
-          registeredAt: new Date().toISOString(),
-        };
-
-        setUser(adminUser);
-        localStorage.setItem("currentUser", JSON.stringify(adminUser));
-        return true;
-      } else {
-        return false;
-      }
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+      // onAuthStateChanged actualizará el estado del usuario automáticamente
+      return true;
     } catch (error) {
       console.error('Login error:', error);
       return false;
@@ -72,8 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem("currentUser");
+    signOut(auth).catch((error) => console.error('Logout error:', error));
   };
 
   const value: AuthContextType = {

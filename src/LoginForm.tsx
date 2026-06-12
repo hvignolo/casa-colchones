@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Bed, Lock } from 'lucide-react';
-import { User } from './types';
 
 interface LoginFormProps {
   onLogin: (username: string, password: string, businessName: string) => Promise<boolean>;
@@ -9,7 +8,7 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: "",
   });
   const [loginError, setLoginError] = useState("");
@@ -18,41 +17,36 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError("");
-    setIsLoading(true);
 
     // Validaciones
-    if (!formData.username.trim()) {
-      setLoginError("El usuario es requerido");
-      setIsLoading(false);
+    if (!formData.email.trim()) {
+      setLoginError("El email es requerido");
       return;
     }
 
     if (!formData.password.trim()) {
       setLoginError("La contraseña es requerida");
-      setIsLoading(false);
       return;
     }
 
+    setIsLoading(true);
 
+    try {
+      const success = await onLogin(
+        formData.email,
+        formData.password,
+        "" // Business name no longer used for input
+      );
 
-    // Simular delay de autenticación
-    setTimeout(async () => {
-      try {
-        const success = await onLogin(
-          formData.username,
-          formData.password,
-          "" // Business name no longer used for input
-        );
-
-        if (!success) {
-          setLoginError("Usuario o contraseña incorrectos");
-        }
-      } catch (error) {
-        console.error('Error during login:', error);
-        setLoginError("Error durante el proceso de autenticación");
+      if (!success) {
+        setLoginError("Email o contraseña incorrectos");
       }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setLoginError("Error durante el proceso de autenticación");
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
 
@@ -115,23 +109,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onShowToast }) => {
             </div>
           )}
 
-          {/* Username Field */}
+          {/* Email Field */}
           <div>
-            <label htmlFor="login-username" className="block text-sm font-medium text-gray-700 mb-2">
-              Usuario
+            <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email
             </label>
             <input
-              type="text"
-              id="login-username"
-              name="username"
-              value={formData.username}
-              onChange={(e) => handleInputChange("username", e.target.value)}
+              type="email"
+              id="login-email"
+              name="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
               className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 ${loginError ? "border-red-300" : "border-gray-300"
                 }`}
-              placeholder="Ingresa tu usuario"
+              placeholder="Ingresa tu email"
               required
               disabled={isLoading}
-              autoComplete="username"
+              autoComplete="email"
             />
           </div>
 

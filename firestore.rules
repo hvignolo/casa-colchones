@@ -1,35 +1,37 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if user is admin
-    function isAdmin() {
-      return request.auth != null && request.auth.token.email == "bautinapuntadas@gmail.com";
+    // Cualquier usuario autenticado con Firebase Auth (el administrador del panel).
+    function isSignedIn() {
+      return request.auth != null;
     }
 
-    // Products: Public read, Admin write
-    // If you add real Firebase Auth later, change write to isAdmin()
+    // Productos: lectura pública (catálogo), escritura solo autenticado.
     match /products/{productId} {
       allow read: if true;
-      allow write: if true; // Temporarily open for the app to function without valid Firebase Auth token
+      allow write: if isSignedIn();
     }
 
-    // Orders: Anyone can create
+    // Pedidos: cualquiera puede crear (clientes), el resto solo autenticado.
     match /orders/{orderId} {
       allow create: if true;
-      allow read, update, delete: if true; // Temporarily open
+      allow read, update, delete: if isSignedIn();
     }
 
-    // Settings: Public read
+    // Configuración de la tienda: lectura pública, escritura solo autenticado.
     match /settings/{settingId} {
       allow read: if true;
-      allow write: if true; // Temporarily open
+      allow write: if isSignedIn();
     }
 
-    // Personal Accounts
-    // Changed to public access because the app uses local auth (AuthContext) 
-    // instead of real Firebase Auth, so request.auth is null.
+    // Ventas de contado: datos internos, solo autenticado.
+    match /cash_sales/{saleId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Cuentas personales (ventas en cuotas): datos internos, solo autenticado.
     match /personal_accounts/{accountId} {
-      allow read, write: if true;
+      allow read, write: if isSignedIn();
     }
   }
 }
